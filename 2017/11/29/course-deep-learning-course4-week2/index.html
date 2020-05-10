@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Learning Notes-Deep Learning, course4, week2 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Learning Notes-Deep Learning, course4, week2
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2017-11-29T08:26:12.000Z" itemprop="datePublished">Nov 29 2017</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/learning-notes/">learning notes</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 minutes read (About 936 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>我们继续来看看course4的week2，CNN的知识还是蛮丰富的，本周主要讲了一些经典的CNN结构以及一些computer vision的技巧和知识，一起recap一下。<br><a id="more"></a></p>
+<h2 id="Classic-Networks"><a href="#Classic-Networks" class="headerlink" title="Classic Networks"></a>Classic Networks</h2><p>Ng一共给我们带来了3个最为经典的CNN网络，这里我会给出网络的截图和paper原文，抽空我也会看看原文，希望大家和我一起来看看。</p>
+<h3 id="LeNet-5"><a href="#LeNet-5" class="headerlink" title="LeNet-5"></a>LeNet-5</h3><p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-1.png" alt=""><br><a href="http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf" target="_blank" rel="noopener">Lécun Y, Bottou L, Bengio Y, et al. Gradient-based learning applied to document recognition[J]. Proceedings of the IEEE, 1998, 86(11):2278-2324.</a></p>
+<h3 id="AlexNet"><a href="#AlexNet" class="headerlink" title="AlexNet"></a>AlexNet</h3><p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-2.png" alt=""><br><a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf" target="_blank" rel="noopener">Krizhevsky A, Sutskever I, Hinton G E. ImageNet classification with deep convolutional neural networks[J]. Communications of the Acm, 2012, 60(2):2012.</a></p>
+<h3 id="VGG-16"><a href="#VGG-16" class="headerlink" title="VGG-16"></a>VGG-16</h3><p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-3.png" alt=""><br><a href="https://arxiv.org/pdf/1409.1556.pdf" target="_blank" rel="noopener">Simonyan K, Zisserman A. Very Deep Convolutional Networks for Large-Scale Image Recognition[J]. Computer Science, 2014.</a></p>
+<p>以上可以说是最为经典的三个cnn网络了，大家可以通过阅读paper获得一些详细的知识，都是经典之作，推荐阅读。</p>
+<h2 id="Residual-Networks-ResNets"><a href="#Residual-Networks-ResNets" class="headerlink" title="Residual Networks(ResNets)"></a>Residual Networks(ResNets)</h2><p>对于residual networks，我们在这里具体看一下，它的具体原理可以通过下图的residual block来看看：<br>其实，residual block是把\(a^{[l]}\)直接作为\(a^{[l+2]}\)输入，也就是说：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-4.png" alt=""><br>$$a^{[l+2]}=g(z^{[l+2]}+a^{[l]})$$<br>其中\(g\)是activation function，如ReLU等。这种思想也被称为short circuit或者skip connection。把上面的residual block串联起来，就变成了我们的residual networks，如下图：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-5.png" alt=""><br>Residual networks最大的特点就是，普通networks随着layer增大，training error理论上是会变小，但是实际上会在某个最小点后增大，但是residual networks则会严格的随着layer增多而减小training error，下面是原文：<br><a href="https://arxiv.org/pdf/1512.03385.pdf" target="_blank" rel="noopener">He K, Zhang X, Ren S, et al. Deep Residual Learning for Image Recognition[J]. 2015:770-778.</a></p>
+<h2 id="Network-in-Network-and-1×1-Convolutions"><a href="#Network-in-Network-and-1×1-Convolutions" class="headerlink" title="Network in Network and 1×1 Convolutions"></a>Network in Network and 1×1 Convolutions</h2><p>通常我们使用的filter，都是奇数的kernel matrix，在某些情况下，1×1的filter也会被我们使用，它到底有什么作用呢？我们来看一张图：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-6.png" alt=""><br>从这张图中可以看出，1×1的filter可以压缩input的channel(depth)，因此1×1filter还是有一些意思的。下面是原文：<br><a href="https://arxiv.org/pdf/1312.4400.pdf" target="_blank" rel="noopener">Lin M, Chen Q, Yan S. Network In Network[J]. Computer Science, 2013.</a></p>
+<h2 id="Inception-Network"><a href="#Inception-Network" class="headerlink" title="Inception Network"></a>Inception Network</h2><p>关于inception network，我们先来看一张图：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-7.png" alt=""><br>对于同一个input，我们分别采用不同的filter，甚至max pooling，在保证输出的hight和width一样的前提下，将结果堆叠起来，作为我们的输出，这样做的好处是，我们不需要自己挑选filter，我们将所有的可能都交给network，让它来决定去选择什么样子的结构。原文是：<br><a href="https://arxiv.org/pdf/1409.4842.pdf" target="_blank" rel="noopener">Szegedy C, Liu W, Jia Y, et al. Going deeper with convolutions[C].  Computer Vision and Pattern Recognition. IEEE, 2015:1-9.</a><br>同时，Ng在课程上说明，inception network 中大量使用了1×1filter来降低计算量，这一点值得我们注意。<br>我们来看看Inception 单元的图解：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/14/14-8.png" alt=""><br>这一周的课程感觉量很大，介绍了很多的网络，我准备下面慢慢的看看这些paper，站在巨人的肩上去看世界，一定会有别样的风景！</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="hhttps://www.coursera.org/learn/convolutional-neural-networks" target="_blank" rel="noopener">Deep learning-Coursera Andrew Ng</a></li>
+<li><a href="https://mooc.study.163.com/course/2001281004#/info" target="_blank" rel="noopener">Deep learning-网易云课堂 Andrew Ng</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/CNN/">#CNN</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2018/01/07/spark-spark-workflow/">Spark工作流程简析</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/11/26/course-deep-learning-course4-week1/">Learning Notes-Deep Learning, course4, week1</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2017/11/29/course-deep-learning-course4-week2/';
+        this.page.identifier = '2017/11/29/course-deep-learning-course4-week2/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

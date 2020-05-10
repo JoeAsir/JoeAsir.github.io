@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Second Generation Tungsten Engine in Spark 2.x - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#Project-Tungsten">1&nbsp;&nbsp;<b>Project Tungsten</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#WholeStageCodeGen">2&nbsp;&nbsp;<b>WholeStageCodeGen</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Volcano-Iterator-Model">2.1&nbsp;&nbsp;Volcano Iterator Model</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Bottom-up-Model">2.2&nbsp;&nbsp;Bottom-up Model</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Loop-pipelining">2.2.1&nbsp;&nbsp;Loop-pipelining</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Loop-unrolling">2.2.2&nbsp;&nbsp;Loop-unrolling</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Whole-Stage-Code-Generation">2.3&nbsp;&nbsp;Whole Stage Code Generation</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Vectorization">3&nbsp;&nbsp;<b>Vectorization</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Vector-Processing">3.1&nbsp;&nbsp;Vector Processing</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Column-Format">3.2&nbsp;&nbsp;Column Format</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Summary">4&nbsp;&nbsp;<b>Summary</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#References">5&nbsp;&nbsp;<b>References</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Second Generation Tungsten Engine in Spark 2.x
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2018-11-14T07:41:15.000Z" itemprop="datePublished">Nov 14 2018</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/spark/">spark</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            10 minutes read (About 1455 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/adventure-climb-691668.jpg" alt=""><br>This article is about the 2nd generation Tungsten engine, which is the core project to optimize Spark performance. Compared with the 1st generation Tungsten engine, the 2nd one mainly focuses on optimizing query plan and speeding up query execution, which is a pretty aggressive goal to get orders of magnitude faster performance. Let’s take a look!<br><a id="more"></a></p>
+<h2 id="Project-Tungsten"><a href="#Project-Tungsten" class="headerlink" title="Project Tungsten"></a>Project Tungsten</h2><p>In the past several years, both storage and network IO bandwidth have been largely improved, while CPU efficiency bound has not. As results, CPU now becomes the new bottleneck and we have to substantially try to improve the efficiency of memory and CPU and push the performance of Spark closer to the limits of modern hardware, which is the main propose of Tungsten. To achieve it, three initiatives in 1st generation Tungsten engine are proposed, including:</p>
+<blockquote>
+<ul>
+<li>Memory Management and Binary Processing: leveraging application semantics to manage memory explicitly and eliminate the overhead of JVM object model and garbage collection</li>
+<li>Cache-aware computation: algorithms and data structures to exploit memory hierarchy</li>
+<li>Code generation: using code generation to exploit modern compilers and CPUs</li>
+</ul>
+</blockquote>
+<p>As we can see, the first two initiatives mainly foucus on memory, and the last one are for CPUs. In the 2nd generation Tungsten engine, rather than code generation, WholeStageCodeGen and Vectorization are proposed for the order of magnitude faster.</p>
+<h2 id="WholeStageCodeGen"><a href="#WholeStageCodeGen" class="headerlink" title="WholeStageCodeGen"></a>WholeStageCodeGen</h2><p>As the name presents, WholeStageCodeGen, aka whole-stage-code-generation, collapses the entire query into a single stage, or maybe a single function. So why combining all the query into a single stage could significantly improve the CPU efficiency and gain performance? We may take a quick look at what it looks like in 1st Tungsten engine.</p>
+<h3 id="Volcano-Iterator-Model"><a href="#Volcano-Iterator-Model" class="headerlink" title="Volcano Iterator Model"></a>Volcano Iterator Model</h3><p>What a vividly name! Volcano iterator model, as presents in the figure, would generate an interface for each operator, and the each operator would get the results from its parent one by one, just like the volcano eruption from bottom to top.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/19/19-1.png" alt=""><br>Although Volcano Model can combine arbitrary operators together without worry about the data type of each operator provides, which makes it a popular classic query evaluation strategy in the past 20 years, there are still many downsides and we will take about it later. </p>
+<h3 id="Bottom-up-Model"><a href="#Bottom-up-Model" class="headerlink" title="Bottom-up Model"></a>Bottom-up Model</h3><p>In <a href="https://databricks.com/blog/2016/05/23/apache-spark-as-a-compiler-joining-a-billion-rows-per-second-on-a-laptop.html" target="_blank" rel="noopener">this blog</a>, a hand-written code is proposed to implement the query in the figure above, it’s just a so simple for-loop that even a college freshman can complete, which is:<br><figure class="highlight scala hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">var</span> count = <span class="hljs-number">0</span></span><br><span class="line"><span class="hljs-keyword">for</span> (ss_item_sk in store_sales) &#123;</span><br><span class="line">  <span class="hljs-keyword">if</span> (ss_item_sk == <span class="hljs-number">1000</span>) &#123;</span><br><span class="line">      count += <span class="hljs-number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Even though the code is pretty simple, the comparison of performance  between Volcano Iterator Model and Bottom-up Model will do shake you.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/19/19-2.png" alt=""><br>But why is that? Seems it turn out it to be caused by following downsides of Volcano Iterator Model:</p>
+<ul>
+<li>Too many virtual functions calls:<br>In Volcano Iterator Model, when one operator call for the next operator, a virtual function <strong>next()</strong> would be called. But in Bottom-up Model, there is no virtual function called because all the operations are combined in a single loop function.</li>
+<li>Intermediate data of Volcano Iterator Model are in memory while of Bottom-up Model are in CPU registers:<br>As one operator transforms data to another one in Volcano Iterator Model, the intermediate data can only be cached in Memory. But for Bottom-up Model, as there is no need to be transformed, data are always in CPU registers.</li>
+<li>Volcano Iterator Model don’t take advantage of modern techniques, which Bottom-up Model do, such as loop-pipelining, loop-unrolling and so on:<br>As Bottom-up Model evaluates the whole query into a single loop function, some modern technique can be used in the Bottom-up Model, I will show you two of them, which are loop-pipelining and loop-unrolling.</li>
+</ul>
+<h4 id="Loop-pipelining"><a href="#Loop-pipelining" class="headerlink" title="Loop-pipelining"></a>Loop-pipelining</h4><p>In a loop iteration function, one iteration of loop usually begins when the previous one is complete, which means the iteration of the loop should be executed sequentially one by one. While loop-pipelining can make some differences. The figure below could learn about it clearly. Loop-pipelining increases the parallelism of the loop iteration by implementing a concurrent manner.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/19/19-3.png" alt=""></p>
+<h4 id="Loop-unrolling"><a href="#Loop-unrolling" class="headerlink" title="Loop-unrolling"></a>Loop-unrolling</h4><p>Loop-unrolling is another technique to exploit parallelism between loop iterations. Let’s learn about it by the code:<br><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// without loop-unrolling</span></span><br><span class="line"><span class="hljs-keyword">int</span> sum=<span class="hljs-number">0</span>;</span><br><span class="line"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">10</span>; i++) &#123;</span><br><span class="line">    sum+=a[i];</span><br><span class="line">&#125;</span><br><span class="line"><span class="hljs-comment">// with loop-unrolling</span></span><br><span class="line"><span class="hljs-keyword">int</span> sum = <span class="hljs-number">0</span>;</span><br><span class="line"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">10</span>; i+=<span class="hljs-number">2</span>) &#123;</span><br><span class="line">    sum += a[i];</span><br><span class="line">    sum += a[i+<span class="hljs-number">1</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>As shown above, loop-unrolling creates multiple copies of the loop body and also changes the loop iteration counter. Reducing loop iteration number, loop-unrolling also create more operation in each loop iteration and, as results, more parallisim could be exploited. </p>
+<h3 id="Whole-Stage-Code-Generation"><a href="#Whole-Stage-Code-Generation" class="headerlink" title="Whole Stage Code Generation"></a>Whole Stage Code Generation</h3><p>Fusing operators together to make the generated code looks like the hand-writing bottom-up model, WholeStageCodeGen makes chains of operators as a single stage, and it has been the alternatives for the Code Generation in Catalyst Optimization. It takes advantages of hand-writing and significantly optimizes the query evaluation and can be easily found in the DAG of your Spark application.</p>
+<h2 id="Vectorization"><a href="#Vectorization" class="headerlink" title="Vectorization"></a>Vectorization</h2><p>Although the WholeStageCodeGen makes a huge optimization of the query plan, there are still some problems. For example, when we import some external integrations, such as tensorflow, scikit-learn, and some python packages, these code cannot be optimized by the WholeStageCodeGen cause they cannot be merged in our code. What’s more, the complicated IO cannot be fused, reading Parquet or ORC for instance. How to speed up this excution? The answer is improving the in-core parallelism for an operation of data, so <strong>Vector Processing</strong> and <strong>Column Format</strong> are used in 2nd generation Tungsten engine.</p>
+<h3 id="Vector-Processing"><a href="#Vector-Processing" class="headerlink" title="Vector Processing"></a>Vector Processing</h3><blockquote>
+<p>In computing, a vector processor or array processor is a central processing unit (CPU) that implements an instruction set containing instructions that operate on one-dimensional arrays of data called vectors, compared to scalar processors, whose instructions operate on single data items.</p>
+</blockquote>
+<p>The following figure presents the differences between Scalar and Vector Processing.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/19/19-4.png" alt=""></p>
+<p>And we find out that Vector Processing really fasten the operation. How does Vector Processing be implemented? We may need to learn something about SIMD(Single Instruction, Multiple Data)</p>
+<blockquote>
+<p>Single instruction, multiple data (SIMD) is a class of parallel computers in Flynn’s taxonomy. It describes computers with multiple processing elements that perform the same operation on multiple data points simultaneously.</p>
+</blockquote>
+<p>Let me show one figure to show what’s SIMD breifly.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/19/19-5.png" alt=""><br>As presented above, SIMD can process multuple data via single instruction, and the data are all in an one-dimesional vector. As results, take advantage of SMID, Vector Processing can improve the in-core parallelism and thus make the operation faster. For the sake of the data are all in an one-dimesonal vector in SIMD, Colunm Format could be a better choice for Spark.</p>
+<h3 id="Column-Format"><a href="#Column-Format" class="headerlink" title="Column Format"></a>Column Format</h3><p>Column Format has been widely used in many fields, such as disk storage. The following figure shows the differences between Row Format and Column Format.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/19/19-6.png" alt=""></p>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><p>WholeStageCodeGen and Vectorization in 2nd generation Tungsten engine really optimize the query plan and speed up the query execution. Compared with 1st generation Tungsten engine, the 2nd one mainly foucses on improving the CPU parallelism to take advtange of some modern techniques. There are many terms and konwledges about CPU exection, which I learn so little that may make some mistakes in this blog, so it would be very nice of you to figure out any single mistake.</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html" target="_blank" rel="noopener">Project Tungsten: Bringing Apache Spark Closer to Bare Metal</a></li>
+<li><a href="https://databricks.com/blog/2016/05/23/apache-spark-as-a-compiler-joining-a-billion-rows-per-second-on-a-laptop.html" target="_blank" rel="noopener">Apache Spark as a Compiler: Joining a Billion Rows per Second on a Laptop<br>Deep dive into the new Tungsten execution engine</a></li>
+<li><a href="https://spoddutur.github.io/spark-notes/second_generation_tungsten_engine.html" target="_blank" rel="noopener">Spark 2.x - 2nd generation Tungsten Engine</a></li>
+<li><a href="https://www.xilinx.com/support/documentation/sw_manuals/xilinx2015_2/sdsoc_doc/topics/calling-coding-guidelines/concept_pipelining_loop_unrolling.html#" target="_blank" rel="noopener">Loop Pipelining and Loop Unrolling</a></li>
+<li><a href="http://www.cac.cornell.edu/education/training/ParallelFall2012/Vectorization.pdf" target="_blank" rel="noopener">Vectorization: Ranger to Stampede Transition</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/spark/">#spark</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2019/02/26/jvm-java-garbage-collection-overview/">Java Garbage Collection Overview</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2018/10/13/spark-sumup-part-2/">Spark Tips Sum-up Part-2</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2018/11/14/spark-second-generation-tungsten-in-spark/';
+        this.page.identifier = '2018/11/14/spark-second-generation-tungsten-in-spark/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

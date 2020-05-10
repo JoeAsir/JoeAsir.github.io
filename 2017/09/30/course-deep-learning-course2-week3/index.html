@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Learning Notes-Deep Learning, course2, week3 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Learning Notes-Deep Learning, course2, week3
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2017-09-30T07:44:25.000Z" itemprop="datePublished">Sep 30 2017</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/learning-notes/">learning notes</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            9 minutes read (About 1363 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>不知不觉来到第三周的课程了，大家加油！这周的主要内容是hyperparameter selection和batch normal的问题，我们一起来看看这一周的内容！<br><a id="more"></a></p>
+<h2 id="Hyperparameter-selection"><a href="#Hyperparameter-selection" class="headerlink" title="Hyperparameter selection"></a>Hyperparameter selection</h2><p>Hyperparameter selection在machine learning中是一个非常重要的优化过程，例如gradient descent中的learning rate \(\alpha\)就是关乎算法结果的重要hyperparameter，那么我们应该怎么去选择呢？Ng给出了两个建议：</p>
+<ul>
+<li>构建多个hyperparameter交叉，随机选择大小，选择效果较好的范围，继续随机选择hyperparameter大小，观察结果。</li>
+<li>选择参数的时候分段选择，并且使用log分段，例如在0.0001到1之间选择，将数轴分成0.0001，0.001，0.01，0.1和1，这样选择出的结果更好</li>
+</ul>
+<p>对于整体模型的hyperparameter selection，Ng也出了建议，那就是babysitting和parallel方法，一种是对一个模型多次调整，一种是同时启动多个不同hyperparameter的模型，最后取效果最好的。</p>
+<p>两种方法殊途同归，可以根据自己的具体情况做出选择。</p>
+<h2 id="Batch-norm"><a href="#Batch-norm" class="headerlink" title="Batch norm"></a>Batch norm</h2><h3 id="Normalization"><a href="#Normalization" class="headerlink" title="Normalization"></a>Normalization</h3><p>相信大家都听说过大名鼎鼎的normalization吧，这是一种很棒的数据预处理的方法，它可以很好的提升数据处理（例如gradient descent）的速度和效果，在引入batch norm之前，我也稍微提一下normalization，下面上公式：</p>
+<p>对于输入数据来说，我们可以按以下方法来normalize<br>$$ \mu = \frac{1}{m} \sum_i x^{(i)}$$<br>$$X = X- \mu$$<br>$$ \sigma^2 = \frac{1}{m} \sum_i (x^{(i)})^2 $$<br>$$ X = X/ \sigma ^2$$<br>这样，我们就把输入数据转化成了符合期望为0，方差为1的Gaussian distribution的数据。</p>
+<p>当然，这只是normaliztion中的一种方法，也是被称作z-score方法。</p>
+<h3 id="Batch-norm-1"><a href="#Batch-norm-1" class="headerlink" title="Batch norm"></a>Batch norm</h3><p>上面说的normalization方法可以推广到neural networks中，对于nerual networks中的某一个layer来说，可以看做是一个孤立的计算过程，在这个过程中，我们可以引入normalization，对于\(z^{(i)}\)来说：<br>$$ \mu = \frac{1}{m} \sum_i z^{(i)}$$<br>$$ \sigma ^2= \frac{1}{m} \sum_i (z^{(i)}- \mu)^2 $$<br>$$z^{(i)}<em>{norm}= \frac{z^{(i)}- \mu}{ \sqrt{ \sigma^2 + \epsilon}}$$<br>$$z^{N(i)}= \gamma z^{(i)}</em>{norm} + \beta$$<br>然后我们用最终的\(z^{N[l](i)}\)来替换\(z^{[l](i)}\) 就可以，其中\( \gamma\)和\(\beta\)是两个parameter，可以通过gradient descent来更新，这两个parameter存在的意义，就是可以调整normalization映射的Gaussian distribution，而不是统统映射到Normal distribution，值得注意的是，\(\epsilon\)是一个很小的数，用来避免分母分0的情况。</p>
+<p>如果\(\gamma = \sqrt{ \sigma^2 + \epsilon}\)且\( \beta = \mu\)的话，那么其实\(z^{N(i)}=z^(i)\)的，大家可以算算，这种情况下，就是相当于没做normalization.</p>
+<h3 id="Batch-norm-on-neural-networks"><a href="#Batch-norm-on-neural-networks" class="headerlink" title="Batch norm on neural networks"></a>Batch norm on neural networks</h3><p>对于neural networks，输入\(X\)通过parameter\(w^{[1]}\)和\(b^{[1]}\)得到\(z^{[1]}\)，通过\(\beta\)和\(\gamma\)获得\(z^{N[1]}\)，经过active function后获得\(a^{[1]}\)，通过\(w^{[2]}\)和\(b^{[2]}\)获得\(z^{[2]}\)，如此下去，一直到最后的输出层，完成forward propagation.</p>
+<p>在整个过程中，一共有四个parameters，分别是\(w^{[l]}\)，\(b^{[l]}\)，\( \beta^{[l]}\)，\( \gamma^{[l]}\)，我们都知道：<br>$$z^{[l]}=w^{[l]}a^{[l-1]}+b^{[l]}$$<br>但是，我们在做batch normal的时候，首先会把\(z^{[l]}\)映射到期望为1方差为0的Gaussian distribution上，这就意味着\(b^{[l]}\)是可以忽略掉的，因为即使保留，在batch normal的时候也会被减去，因此，我们的parameter只有三个，即：\(w^{[l]}\)，\( \beta^{[l]}\)，\( \gamma^{[l]}\)</p>
+<p>在backforward的时候，我们和普通的neural networks一样，只是可以不用再去计算\(db\)</p>
+<h3 id="Solve-covariate-shift"><a href="#Solve-covariate-shift" class="headerlink" title="Solve covariate shift"></a>Solve covariate shift</h3><p>什么是covariate shift？简单的理解，就是模型需要随着样本的变化而变化，Ng举的例子就很直观，在猫脸试验中，假设training set里都是黑猫，这样获得的模型，对于花猫识别就是不适用的，这就叫covariate shift. 其实，batch norm可以改善neural networks效果的原因，就可以理解为solve covariate shift的过程。</p>
+<p>OK，我们来详细看看原因，假设我们有一个如图的neural networks：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/8/8-1.png" alt=""><br>在标示出的位置，有parameter\(w^{[3]}\)和\(b^{[3]}\)，如果我们盖住前面的部分，那么我们将获得如图的neural networks<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/8/8-2.png" alt=""><br>对于neural networks来说，相当于获得了黑箱输出的\(a^{[2]}\)，而\(a^{[2]}\)的值其实并不是是固定的，每一次iteration后都有不一样的\(a^{[2]}\)，这就产生了covariate shift问题。</p>
+<p>但是，batch norm可以将\(a^{[2]}\)的期望和方差限制到\(\beta\)和\(gamma\)控制的范围内，以此<strong>极大限度</strong>的缓解了covariate shift现象。</p>
+<p>另外，batch norm还可以有一些regularization的作用，由于每次mini-batch gradient descent中batch norm作用的sample不一样，类似于dropout的效果，会给对应layer加入一些噪声，以此产生一些regularization的效果。但是，我们一般不会把batch norm列入regularization范畴内。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://www.coursera.org/specializations/deep-learning" target="_blank" rel="noopener">Deep learning-Coursera Andrew Ng</a></li>
+<li><a href="https://mooc.study.163.com/course/deeplearning_ai-2001281003#/info" target="_blank" rel="noopener">Deep learning-网易云课堂 Andrew Ng</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/hyperparameter/">#hyperparameter</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/batch-norm/">#batch norm</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/covariate-shift/">#covariate shift</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2017/10/12/course-deep-learning-course3-week1/">Learning Notes-Deep Learning, course3, week1</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/09/27/course-deep-learning-course2-week2/">Learning Notes-Deep Learning, course2, week2</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2017/09/30/course-deep-learning-course2-week3/';
+        this.page.identifier = '2017/09/30/course-deep-learning-course2-week3/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

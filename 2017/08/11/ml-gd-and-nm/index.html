@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>再深入聊聊梯度下降和牛顿法 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            再深入聊聊梯度下降和牛顿法
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2017-08-11T09:26:56.000Z" itemprop="datePublished">Aug 11 2017</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/machine-learning/">machine learning</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            15 minutes read (About 2290 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>上次我们一起聊到了gradient descent和newton’s method，而且我们已经知道了gradient descent和newton’s method都是convex optimization的好方法，这次我们就跳出convex optimization，从更大的unconstrained optimization角度来探讨下这两种方法之间的关联和区别。<br><a id="more"></a></p>
+<p>假设我们现有一个的optimization task，要求objective function \(f(x)\)的最小值，我们一般有两种方案：</p>
+<ul>
+<li>考虑到\(f(x)\)的最小值很有可能是全局最小值，那么我们可以通过寻找\( \nabla f(x)=0\)的点来确定最小值，这就是<strong>newton’s method</strong>的思想</li>
+<li>既然我们要寻找最小值，那我们可以顺着一条\(f(x)\)逐渐减小的路径，顺着这条路径一直走下去，直到不再变小，这就是<strong>gradient descent</strong>的思想</li>
+</ul>
+<p>OK，简单的叙述之后，我们开始正题！</p>
+<h2 id="泰勒级数-Taylor-series"><a href="#泰勒级数-Taylor-series" class="headerlink" title="泰勒级数(Taylor series)"></a>泰勒级数(Taylor series)</h2><p>首先我们需要回忆一下高等数学中重要的Taylor series，如果\( f(x)\)在点\( x_0\)的领域内具有\(n+1\)阶导数，那么，在该领域内，\( f(x)\)可展开成\(n\)阶Taylor series，忽略无限大次项的形式就是<br>$$f(x)=f(x_0)+ \nabla f(x_0)(x-x_0) + \frac{ \nabla ^2 f(x_0)}{2!}(x-x_0)^2 +…+\frac{ \nabla ^n f(x_0)}{n!}(x-x_0)^n $$<br>其实在高等数学中学到Taylor series的时候，我本人是十分无感的，我并不知道这个东西到底有什么用处，相信很多人和我有相似的经历。</p>
+<blockquote>
+<p>In mathematics, a Taylor series is a representation of a function as an infinite sum of terms that are calculated from the values of the function’s derivatives at a single point.</p>
+</blockquote>
+<p>事实上，Taylor series所表现的是，对于\( f(x)\)在点\( x_0\)附近的一个估计，也可以理解为，根据\( x_0\)点处的各阶derivatives之和构成一个新的function，这个function就是对\(f(x)\)的逼近和拟合，而且这种逼近和拟合，随着Taylor series阶数增加而更接近于真实的\(f(x)\)。如果我们使用0阶Taylor series来逼近的话，那我们就粗暴的认为，\( f(x)\)在点\( x_0\)附近的值就都是\(x_0\)，这当然太粗暴直接了，哈哈。</p>
+<p>既然这太粗暴了，那么我们就用1st order Taylor series来做一个逼近和估计，这就是gradient descent的思想；如果我们用2nd order Taylor series来估计呢，那就成了newton’s method了</p>
+<p>OK，我们继续娓娓道来。</p>
+<h2 id="1st-order-Taylor-series-amp-gradient-descent"><a href="#1st-order-Taylor-series-amp-gradient-descent" class="headerlink" title="1st order Taylor series &amp; gradient descent"></a>1st order Taylor series &amp; gradient descent</h2><p>假设\(x_k\)是第k次gradient descent迭代后的\(x\)取值，那我们在此处的1st order Taylor series 就是<br>$$f(x)=f(x_k)+ \nabla f(x_k)(x-x_k)$$<br>其中\(x\)是迭代的下一个方向，gradient descent的目标就是让\(f(x)\)达到局部甚至全局最小值，那么每一次迭代，也需要尽可能的减小更多以达到这个目的，那么<br>$$f(x_k)-f(x)=- \nabla f(x_k)(x-x_k)$$<br>显然，上式应该尽可能的大，即<strong>\(- \nabla f(x_k)(x-x_k)\)越大越好</strong>，我们现在把\((x-x_k)\)做一个替换，用单位向量\(\vec g\)和标量\( \alpha\)分别代表方向和大小，现在的任务就变成了<br>$$ \min \nabla f(x_k)(x-x_k) = \min( \alpha \vec{\nabla f(x_k)}⋅ \vec g)$$<br>我们都知道，<strong>对于两个向量来说，当他们方向相反时，他们的内积是最小的</strong>。</p>
+<blockquote>
+<p>梯度方向的定义是该点梯度在标量场增长最快的方向</p>
+</blockquote>
+<p>因此当\(\vec g\)的方向是\( \vec{\nabla f(x_k)}\)的反方向时，上式可以取到最小值，于是就有<br>$$x-x_k=- \alpha \nabla f(x_k)$$<br>$$x:=x_k- \alpha \nabla f(x_k)$$<br>到这一步，是不是看到了熟悉的gradient descent呢，yeah mate！We make it!</p>
+<h2 id="2nd-order-Taylor-series-amp-newton’s-method"><a href="#2nd-order-Taylor-series-amp-newton’s-method" class="headerlink" title="2nd order Taylor series &amp; newton’s method"></a>2nd order Taylor series &amp; newton’s method</h2><p>和上面的gradient descent相似，假设\(x_k\)是第\(k\)次newton’s method迭代后的\(x\)取值，那我们在此处的2nd order Taylor series 是<br>$$f(x)=f(x_k)+ \nabla f(x_k)(x-x_k) + \frac{1}{2}(x-x_k)^T \nabla^2 f(x_k)(x-x_k) $$<br>我们对等号两边同时对\(x\)求导，并令其为零<br>$$ \nabla f(x) = \nabla f(x_k) + (x-x_k) \nabla^2 f(x_k)=0$$<br>由于newton’s method的原理就是通过\(\nabla f(x)=0\)来寻找最小值，<strong>故上式为零的解\(x\)其实就是newton’s method在\(k+1\)次迭代后的新的\(x\)值</strong>。其中\(\nabla f(x_k)\)是\(x_k\)处的一阶导数，\( \nabla^2 f(x_k)\)是\(x_k\)处的二阶导数Hessian矩阵元素</p>
+<p>我们令\(\nabla f(x_k)=g\)，\(\nabla^2 f(x_k)=H\)，则上式变成<br>$$g+H(x-x_k)=0$$<br>进一步的<br>$$x=x_k-H^{-1}g$$<br>由于\(-g H^{-1} \) 是优化的前进方向，在寻找最小值的过程中，这个方向一定是和梯度方向\(g\)相反才可以更快的下降，那么就有\( g^T H^{-1} g &gt; 0\)，这不就是positive definite的定义吗？也就是说，<strong>Hessian矩阵是positive definite的</strong>。</p>
+<p>想象一下，如果Hessian是negative definite的话，参数更新的方向就成了和\(g\)相同的方向，newton’s method将会发散，这一点，也是newton’s method的缺点。在objective function是non-convex function的情况下，如果第\(k\)次迭代获得的\(x_k\)处的Hessian matrix negative definite，那么newton’s method将会发散，从而导致不收敛。当然，为了解决这种问题，后续有改进的BFGS等方法，我们在这里暂时不详细讨论。</p>
+<h2 id="Sum-up"><a href="#Sum-up" class="headerlink" title="Sum up"></a>Sum up</h2><p>下面我们再来总结性质的对比一下两种方法，来看一张图<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/2/2-1.png" alt=""><br>事实上，这两种方法都采用了一种逼近和拟合的思想。假设现在处于迭代\(k\)次之后的\(x_k\)点，对于objective function，我们用\(x_k\)点的Taylor series \(f(x)\)来逼近和拟合，当然了，上图我们看到，gradient descent是用一次function而newton’s method采用的是二次function，这是二者之间最显著的区别。</p>
+<p>对于new’s method，在拟合之后，我们通过\( \nabla f(x)=0\)求得的\(x _{k+1}\)点作为此次迭代的结果，下次迭代时候，又在\(x _{k+1}\)处次进行二次function的拟合，并如此迭代下去。</p>
+<p>Newton’s method采用二次function来拟合，我们可以感性的理解为，newton’s method在寻找下降的方向时候，关注的不仅仅是此处objective function value是不是减小(一阶value)，还关注此处value下降的趋势如何(二阶value)，而gradient descent只关心此处function value是不是减小，因此newton’s method可以迭代更少次数获得最优解。对于标准二次型的objective function，newton’s method甚至可以一次迭代就找到全局最小值。</p>
+<p>但是值得注意的是，上面所说的标准二次型function，实质上是convex function，在一般的unconstrained optimization中，更多的情况则是non-convex optimization，对于一般的non-convex optimization，newton’s method是相对不稳定的，因为我们很难保证Hessian matrix的positive definite。鉴于此，我们会加入步长\(\lambda\)限制，防止其一次迭代过大而带来迭代后Hessian matrix negative definite的情况，即<br>$$x:=x- \lambda H^{-1} g$$<br>对于这种思想，我个人认为，是在整体non-convex function中寻找一个局部的convex function，通过步长将newton’s method限制在这个局部中，最后收敛到局部最优中。由此可见，newton’s mtehod在non-convex中受限制比较大。</p>
+<p>相比之下，由于gradient descent采用的一次function做拟合，只需要考虑沿着梯度反方向寻找最小值，因此gradient descent适用于各种场景，甚至是non-convex optimization，虽然不能保证是全局最优，但至少gradient descent是可以值得一试的方法。</p>
+<p>下面来总结一下：</p>
+<ul>
+<li>Gradient descent 和 newton’s method都是利用Taylor series对objective function进行拟合来实现迭代的；</li>
+<li>Gradient descent 采用一次型function拟合而 newton’s method采用的是二次型function，因此newton’s method迭代更迅速；</li>
+<li>Newton’s method每次迭代都会计算Hessian matrix的逆，在高维feature情况下，这使得每次迭代会比较慢；</li>
+<li>Newton’s method在non-convex optimization中很受限制，而gradient descent则不受影响。</li>
+</ul>
+<p>好了，先写这么多，这其中的知识量还是很深奥的，也不知道自己有没有叙述明白，欢迎大家一起来讨论！</p>
+<p><strong>最后感谢优男的宝贵意见！</strong></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="http://www.math.ucla.edu/~biskup/164.2.14f/PDFs/recursions.pdf" target="_blank" rel="noopener">UCLA courseware</a></li>
+<li><a href="https://www.cs.ccu.edu.tw/~wtchu/courses/2014s_OPT/Lectures/Chapter%209%20Newton%27s%20Method.pdf" target="_blank" rel="noopener">CCU courseware</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Taylor_series" target="_blank" rel="noopener">Taylor series</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/gradient-descent/">#gradient descent</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/newton-s-method/">#newton&#39;s method</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/unconstrained-optimization/">#unconstrained optimization</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2017/08/23/paper-facebook/">Reading Notes-Practical lessons from predicting clicks on ads at facebook</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/08/02/ml-convex-opt/">从凸函数到梯度下降和牛顿法</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2017/08/11/ml-gd-and-nm/';
+        this.page.identifier = '2017/08/11/ml-gd-and-nm/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Spark工作流程简析 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Spark工作流程简析
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2018-01-07T10:44:37.000Z" itemprop="datePublished">Jan 7 2018</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/spark/">spark</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            8 minutes read (About 1180 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>Hello，有一个月没写blog了感觉很自责，必须整起来！最近由于工作上遇到的一些调优困难，让我对Spark有些敬畏，所以集中的研究了下鬼魅玄学Spark，和大家分享一下。首先先来看看spark的基本工作流程。<br><a id="more"></a></p>
+<h2 id="Work-Flow"><a href="#Work-Flow" class="headerlink" title="Work Flow"></a>Work Flow</h2><p>和hadoop一样，spark也是master-slave机制，Spark通过driver进程，将task分发到多个executors上并发进行计算。整个driver和所有的executors组成了一个spark application，每一个application是运行在cluster manager上的，Spark本身集成了standalone cluster，当然，Spark还可以运行在赫赫有名的YARN和Mesos上。我平时使用的公司集群都是基于YARN cluster manager的，因此本文重点探讨基于YARN的spark。</p>
+<p>下图就是spark在cluster manager下的整体工作流程。<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/15/15-1.png" alt=""></p>
+<h2 id="The-Driver"><a href="#The-Driver" class="headerlink" title="The Driver"></a>The Driver</h2><p>Driver是整个application最核心的部分，他运行的是application的main方法，它伴随这整个application的生命周期，driver进程的结束就会带来整个application的结束。</p>
+<p>对于所有的Spark任务，他们其实都是实现RDD的transformation和action操作，而这些操作，最后是需要driver将他们转化和分发成tasks，然后才可以去执行。所有的user program都会被driver通过DAG(directed acyclic graph)转化成实际的tasks执行计划，除此之外，driver还会在tasks执行的期间，监控executor上的tasks，并且保证他们拥有健康而合理的资源。</p>
+<h2 id="Executors"><a href="#Executors" class="headerlink" title="Executors"></a>Executors</h2><p>Executors是Spark application的执行者，他们也是伴随着application的生命周期而存在的，值得注意的是，<strong>Spark job在executors执行失败的情况下依然可以继续进行</strong>。Executors会对具体的tasks的执行结果返回给driver，同时给缓存的RDD提供存储空间。</p>
+<h2 id="Some-terms"><a href="#Some-terms" class="headerlink" title="Some terms"></a>Some terms</h2><ul>
+<li>Job: Job是executor层面最大的执行单元，job通过RDD的action操作来分割，每一个action操作就会进行一次job的划分；</li>
+<li>Stage: Stage是包含在job中的执行单元，stage通过RDD的shuffle操作来分割，每进行一次shuffle操作，就会进行一次stage的划分；</li>
+<li>Task: Task是executor执行中最细的执行单元，task的数目取和parent RDD的partition数目是一一对应的。</li>
+</ul>
+<h2 id="Spark-on-Yarn-cluster"><a href="#Spark-on-Yarn-cluster" class="headerlink" title="Spark on Yarn-cluster"></a>Spark on Yarn-cluster</h2><p>下面，我们一起看看整个Spark application中，driver和executors的都会起到什么作用。我以基于yarn-cluster的YARN的Spark作为例子来简述整个流程，先看一张图：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/15/15-2.png" alt=""><br>首先我们要明确一些YARN的概念，YARN是与master-slaver的一个Cluster Manager， 在YARN中，RM(ResourseManager)负责整个调度分发，即我们常说的master；而NM(NodeManager)任务分发的接受者，负责执行具体的任务，也就是我们所说的worker。这些概念后续我专门介绍YARN的时候会详细的说明，他们的作用都是实现spark和YARN之间诸如资源申请等操作。</p>
+<p>首先Client向ResourceManager发出提交application的请求，ResourseManager会在某一个NodeManager上启动AppManager进程，AppManager会随后启动driver，并将driver申请containers资源的信息发给ResourceManager，申请完成后，ResourceManager将资源分配消息传递给AppManager并由它启动container，每一个container中只运行一个spark executor，由此完成了资源的申请和分配。</p>
+<p>然后整个application开始执行，在这个过程中，根据RDD的transformation或者action，driver把这些任务以tasks的形式，源源不断的传送给executors，于是executors不停地进行计算和存储的任务。当driver结束的时候，他会结束掉executors并且释放掉资源。这就是yarn-cluster上spark的整体工作流程。</p>
+<p>除了yarn-cluster，还有一种yarn-client的方法，这种方法唯一的区别在于，他的driver并非运行在某个NodeManager上，而是一直运行在client中。这样的问题就是client一旦关闭，那么整个任务也就随之停止执行。因此相较而言，yarn-cluster更适合线上任务，而yarn-client更适合调试模式。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="http://shop.oreilly.com/product/0636920028512.do" target="_blank" rel="noopener">Karau, Holden, et al. Learning spark: lightning-fast big data analysis. “ O’Reilly Media, Inc.”, 2015.</a></li>
+<li><a href="https://www.iteblog.com/archives/1223.html" target="_blank" rel="noopener">Spark:Yarn-cluster和Yarn-client区别与联系</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/spark/">#spark</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2018/02/23/spark-spark-tune/">Spark Tuning</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/11/29/course-deep-learning-course4-week2/">Learning Notes-Deep Learning, course4, week2</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2018/01/07/spark-spark-workflow/';
+        this.page.identifier = '2018/01/07/spark-spark-workflow/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

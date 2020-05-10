@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Catalyst Optimization in Spark SQL - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#Trees-And-Rules">1&nbsp;&nbsp;<b>Trees And Rules</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Trees">1.1&nbsp;&nbsp;Trees</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Rules">1.2&nbsp;&nbsp;Rules</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Catalyst">2&nbsp;&nbsp;<b>Catalyst</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Parser">2.1&nbsp;&nbsp;Parser</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Analysis">2.2&nbsp;&nbsp;Analysis</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Logcial-Optimization">2.3&nbsp;&nbsp;Logcial Optimization</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Physical-Planning">2.4&nbsp;&nbsp;Physical Planning</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Code-Generation">2.5&nbsp;&nbsp;Code Generation</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#References">3&nbsp;&nbsp;<b>References</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Catalyst Optimization in Spark SQL
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2018-09-25T11:52:15.000Z" itemprop="datePublished">Sep 25 2018</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/spark/">spark</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            8 minutes read (About 1256 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/app-applications-apps.jpg" alt=""><br>Spark SQL is one of the most important components of Apache Spark and has become the fundation of Structure Streaming, ML Pipeline, GraphFrames and so on since Spark 2.0. Also, Spark SQL provides SQL queries and DataFrame/Dataset API, both of which are optimized by Catalyst. Let’s talk about Catalyst today.<br><a id="more"></a><br>Catalyst Optimizer is a great optimization framework to improve Spark SQL performance, especially query capabilities of Spark SQL and it is written by functional programming construct in Scala. RBO(Rule Based Optimization) and CBO(Cost Based Optimization) are the optimization principles of Catalyst. The concept of Catalyst is familiar to many other query optimizers, so understanding Catalyst may help you learn the working pipeline of other query optimizers.</p>
+<h2 id="Trees-And-Rules"><a href="#Trees-And-Rules" class="headerlink" title="Trees And Rules"></a>Trees And Rules</h2><p>We will have a quick review of trees and rules. You can learn more about them by the references. </p>
+<h3 id="Trees"><a href="#Trees" class="headerlink" title="Trees"></a>Trees</h3><p>The tree is the basic datatype in Catalyst, which is consisted of node objects. Each node has a node type, and some children, which could be none. Let’s have an example, the tree for expression x+(1+2) could be translated in Scala as:</p>
+<p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/18/18-3.png" alt=""><br><figure class="highlight scala hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-type">Add</span>(<span class="hljs-type">Attribute</span>(x),<span class="hljs-type">Add</span>(<span class="hljs-type">Literal</span>(<span class="hljs-number">1</span>),<span class="hljs-type">Literal</span>(<span class="hljs-number">2</span>)))</span><br></pre></td></tr></table></figure></p>
+<p>Actually, most of the SQL query optimization, like Catalyst, would transform the SQL to a huge tree structure as the first step of the optimization. Tree structure could be modified, tailored and optimized easily, also it represents the query plan briefly. What’s more, the data can be thrown to every node of the tree by the query plan iteratively. That’s why tree datatype is used and introduced firstly in Catalyst.</p>
+<h3 id="Rules"><a href="#Rules" class="headerlink" title="Rules"></a>Rules</h3><p>Trees can be manipulated by the rules. The optimization can be treated as some transformations from one tree to another under some rules we provide. With the help of rules, we can run arbitrary code and many other operations on the input tree. And the Catalyst will know which part of the tree that rules could match or apply, and will automatically skip over the tree that does not match. The rules are all applied by Scala case class, in other words, one rule can match multiple patterns. Let’s see an example.<br><figure class="highlight scala hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tree.transform &#123;</span><br><span class="line">  <span class="hljs-keyword">case</span> <span class="hljs-type">Add</span>(<span class="hljs-type">Literal</span>(c1),<span class="hljs-type">Literal</span>(c2)) =&gt; <span class="hljs-type">Literal</span>(c1+c2)</span><br><span class="line">  <span class="hljs-keyword">case</span> <span class="hljs-type">Add</span>(left, <span class="hljs-type">Literal</span>(<span class="hljs-number">0</span>)) =&gt; left</span><br><span class="line">  <span class="hljs-keyword">case</span> <span class="hljs-type">Add</span>(<span class="hljs-type">Literal</span>(<span class="hljs-number">0</span>), right) =&gt; right</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Catalyst"><a href="#Catalyst" class="headerlink" title="Catalyst"></a>Catalyst</h2><p>From this section, we will know how Catalyst optimizes Spark SQL, which might improve your understanding of how Spark SQL works and how to manipulate it better. There are four plan through the Catalyst, which are Parsed(Unresolved) Logical Plan, Analyzed Logical Plan, Optimized Logical Plan and Physical Plan. You can find all the four plans in your Spark UI. The figure below presents the workflow of Spark SQL, and the Analysis, Logical Optimization and Physical Planning are all working under the Catalyst, and we will go over one by one.</p>
+<p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/18/18-2.png" alt=""></p>
+<h3 id="Parser"><a href="#Parser" class="headerlink" title="Parser"></a>Parser</h3><p>The first stage in the figure above is called Parser. Despite not a part of Catalyst, Parser is also very crucial in the whole optimization. Spark SQL transform SQL queries to an <a href="http://ns.inria.fr/ast/sql/index.html" target="_blank" rel="noopener">AST</a>(Abstract Syntax Tree), also called Parsed Logical Plan in Catalyst,  by <a href="https://www.antlr.org/" target="_blank" rel="noopener">ANTLR</a>, which is also used in the Hive, presto and so on. However, DataFrame/Dataset object can be transformed to Parsed Logical Plan by the API.</p>
+<h3 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h3><p>Returned by the Parser, Parsed Logical Plan contains many unresolved attribute reference of relation. For example, you have no idea whether the column name provided is correct or type of the column, either. Spark SQL use Catalyst and Catalog object that tracks the data all the time to resolve the attributes. Looking up relations by name from Catalog, mapping all the named attributes to the input, checking the attributes which match to the same value and giving the unique ID and pushing the type information of the attributes, the Parsed Logical Plan is transformed to Analyzed Logical Plan by Catalyst.</p>
+<blockquote>
+<p>Catalogs are named collections of schemas in an SQL-environment. An SQL-environment contains zero or more catalogs. A catalog contains one or more schemas, but always contains a schema named INFORMATION_SCHEMA that contains the views and domains of the Information Schema.</p>
+</blockquote>
+<h3 id="Logcial-Optimization"><a href="#Logcial-Optimization" class="headerlink" title="Logcial Optimization"></a>Logcial Optimization</h3><p>Logical Optimization is mainly based on the rules, which is also called RBO(Rules Based Optimization). Lots of rules are provided in this step to accomplish RBO, including constant folding, predicate pushdown, project pruning and so on. As results, the Optimized Logical Plan is returned by Logical Optimization from Analyzed Logical Plan. Some figures below describe these ROB mentioned.<br><strong>Predicate pushdown</strong> can reduce the computation of join operation by filtering unnecessary data before join.</p>
+<p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/18/18-4.png" alt=""><br><strong>Constant folding</strong> avoids calculating the same operation between constants for each record.</p>
+<p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/18/18-5.png" alt=""><br><strong>Column Pruning</strong> makes Spark SQL only load data which would be used in the table.</p>
+<p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/18/18-6.png" alt=""></p>
+<h3 id="Physical-Planning"><a href="#Physical-Planning" class="headerlink" title="Physical Planning"></a>Physical Planning</h3><p>Since we get the Optimized Logical Plan, Spark still doesn’t know how to execute the it. For instance, Spark knows that there is a join operation, while whether sortMerge Join or Hash Shuffle Join should be invoked. So all the operation would be mapped into a real exection through <a href="https://github.com/apache/spark/blob/v2.3.2/sql/core/src/main/scala/org/apache/spark/sql/execution/SparkStrategies.scala" target="_blank" rel="noopener">SparkStrategy</a>. Transformed from Opktimized Logical Plan by Physical Planning, Physical Plan would guide the Spark on how to handle the data. In Physical Planning, several Physical Plans are generated from Logical Plan, using physical operator matches the Spark execution engine. Using CBO(Cost Based Optimization), Catalyst will select the best performance one as the Physical Plan. However, the CBO is now only used for join and aggregation algorithms selection. Also, CBO is used in Physical Planning to pipelining projections or filters into single Spark <em>map()</em> transformation. What’s more, all</p>
+<h3 id="Code-Generation"><a href="#Code-Generation" class="headerlink" title="Code Generation"></a>Code Generation</h3><p>Getting the Physical Plan from the Physical Planning stage, Spark will translate the AST into Java bytecode to run on each machine. Thanks to quasiquotes, a greate feature of Scala, ASTs would be built by Scala language based on the Physical Plan. And the AST will be send to Scala Compile at runtime to generate<br>ava bytecode. </p>
+<blockquote>
+<p>We use Catalyst to transform a tree representing an expression in SQL to an AST for Scala code to evaluate that expression, and then compile and run the generated code.</p>
+</blockquote>
+<p>In Spark 2.x, the WholeStageCodeGen has been used in code generation stage, you can read more from <a href="https://joeasir.github.io/2018/11/14/spark-second-generation-tungsten-in-spark" target="_blank" rel="noopener">here</a>.</p>
+<p>At last, if you want to see the Logical Plan and Physical Plan of your own Spark SQL, you may do as follows:<br><figure class="highlight scala hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// for Logical Plan</span></span><br><span class="line">spark.sql(<span class="hljs-string">"your SQL"</span>).queryExecution</span><br><span class="line"><span class="hljs-comment">// for Physical Plan</span></span><br><span class="line">spark.sql(<span class="hljs-string">"your SQL"</span>).explain</span><br></pre></td></tr></table></figure></p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://databricks.com/blog/2015/04/13/deep-dive-into-spark-sqls-catalyst-optimizer.html" target="_blank" rel="noopener">Deep Dive into Spark SQL’s Catalyst Optimizer</a></li>
+<li><a href="https://data-flair.training/blogs/spark-sql-optimization-catalyst-optimizer/" target="_blank" rel="noopener">Spark SQL Optimization – Understanding the Catalyst Optimizer</a></li>
+<li><a href="https://github.com/apache/spark/tree/master/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst" target="_blank" rel="noopener">Catalyst Source Code</a></li>
+<li><a href="https://docs.scala-lang.org/overviews/quasiquotes/intro.html" target="_blank" rel="noopener">Quasiquotes Introduction</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/spark/">#spark</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2018/10/13/spark-sumup-part-2/">Spark Tips Sum-up Part-2</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2018/09/22/spark-from-rdd-to-dataframe-dataset/">From Spark RDD to DataFrame/Dataset</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2018/09/25/spark-catalyst-optimization/';
+        this.page.identifier = '2018/09/25/spark-catalyst-optimization/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>YARN Architecture - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#Components">1&nbsp;&nbsp;<b>Components</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Resource-Master-RM">1.1&nbsp;&nbsp;Resource Master(RM)</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Scheduler">1.1.1&nbsp;&nbsp;Scheduler</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Applicaiton-Manager">1.1.2&nbsp;&nbsp;Applicaiton Manager</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Node-Manager-NM">1.2&nbsp;&nbsp;Node Manager(NM)</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Application-Master-AM">1.3&nbsp;&nbsp;Application Master(AM)</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Applicaiton-Submission-on-YARN">2&nbsp;&nbsp;<b>Applicaiton Submission on YARN</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Scheduling-in-YARN">3&nbsp;&nbsp;<b>Scheduling in YARN</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#FIFO-Scheduler">3.1&nbsp;&nbsp;FIFO Scheduler</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Capacity-Scheduler">3.2&nbsp;&nbsp;Capacity Scheduler</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Fair-Scheduler">3.3&nbsp;&nbsp;Fair Scheduler</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#References">4&nbsp;&nbsp;<b>References</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            YARN Architecture
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-06-11T12:18:54.000Z" itemprop="datePublished">Jun 11 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/hadoop/">hadoop</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            7 minutes read (About 1113 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/aerial-shot-bird-s-eye-view-forest-2415927.jpg" alt=""><br>YARN, the abbreviation of <em>Yet Another Resource Negotiator</em>, is introduced in Hadoop 2.0. Compared with MRV1(MapReduce Version 1), YARN takes over the responsibility of <strong>resource management and job scheduling</strong> in MRV1, and make <strong>non-MapReduce</strong> jobs run on the Hadoop, Apache Spark for example. Although there are some rising technology that been treated as alternative of YARN by more and more developers, Kubernetes for instance, YARN is still widely used. Let’s talk about YARN today.<br><a id="more"></a></p>
+<h2 id="Components"><a href="#Components" class="headerlink" title="Components"></a>Components</h2><p>YARN consists of one Resource Manager as master deamon, several slave daemon called Node Manager for each slave node and Application Master for each application.</p>
+<h3 id="Resource-Master-RM"><a href="#Resource-Master-RM" class="headerlink" title="Resource Master(RM)"></a>Resource Master(RM)</h3><p>Resouce Manager(RM) is replacement of <strong>JobTracker</strong> in MapReduce Version 1 and it is the master deamon in YARN and manages the global resources among all the applications. Resource Master has two main components, Scheduler and Application Manager</p>
+<h4 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h4><p>Scheduler is mainly desgined to negotiate resource and it is responsible for allocating the resource for the running applications based on the abstract notion of a resource Container, such as memory, CPU etc. Notice that Container is the basic unit of resource in YARN. Scheduler allocate the resource based on the resource requirment of the application and the resource availabality. Scheduler doesn’t care too much about the application monitoring or tracking, even the restarting failure no matter application or hardware failure.</p>
+<h4 id="Applicaiton-Manager"><a href="#Applicaiton-Manager" class="headerlink" title="Applicaiton Manager"></a>Applicaiton Manager</h4><p>Application Manager is responsible for the maintaining a collection of submitted applications. Application Manager accept the submission of one application from the client and allocate one Container for the application to load its Application Master. What’s more, Application Manager provides the monitoring and tracking service for the running applications and also restarting them if any failure come out.</p>
+<h3 id="Node-Manager-NM"><a href="#Node-Manager-NM" class="headerlink" title="Node Manager(NM)"></a>Node Manager(NM)</h3><p>Node Manager, the update version of <strong>TaskTrack</strong> in MRV1, is the slave deamon in YARN. Node Manager is mainly responsible for the individual Containers management and monitoring. Node Manager tracks the usage of resource among all the Containers in the node and replay the detailed information to Resource Manager and Node Manager also monitors the heath of the running Containers(Node Manager only manage the resource and running status rather than application context information).<br>Node Manager always keep in touch with Resouce Manager with heartbeats, </p>
+<h3 id="Application-Master-AM"><a href="#Application-Master-AM" class="headerlink" title="Application Master(AM)"></a>Application Master(AM)</h3><p>One Application Mater runs for one application in YARN, which means each application has a unique Applicaiton Master. Application Master is responsible to send request to Resouce Manager and acquire resource from the Scheduler. What’s more, Application Master is the process that coordinates the application’s execution and manage the applicaiton faults along with the Node Manager. Also, Application Master sends heartbeats to the Resource Manager periodly to update the health condiction and resource demands.<br>Notice that there is a main difference between the NM and AM, NM only monitors and tracks the status of the dividul Containers while AM the application itself. When an application is running, both NM and AM contributes to the monitoring and tracking, but they focus on the different part.</p>
+<h2 id="Applicaiton-Submission-on-YARN"><a href="#Applicaiton-Submission-on-YARN" class="headerlink" title="Applicaiton Submission on YARN"></a>Applicaiton Submission on YARN</h2><p>As we’ve learned each component of the YARN, let’s take look at how these components work together to submit an application. The workflow is presented below.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/23/23-1.png" alt=""></p>
+<ul>
+<li>Client submits an application to the Resource Manager and request for building an Application Master;</li>
+<li>Rsource Manager, Application Manager actually, allocates a free Container to load the Application Master for the submitted application and then the Application Master then will start;</li>
+<li>Application Master registers to the Resource Manager, after which the client can communicate with the Application Master directly;</li>
+<li>Application Master send request to acquire resource Container for the application to Resouce Manager;</li>
+<li>Resource Manager(Scheduler) notify the Node Manager to launch Containers, and the launched Containers can communicate with Application Master;</li>
+<li>Application code will executed in the Container, and the status can be updated to the Application Master by the <em>application-specific</em>;</li>
+<li>While the application is running, client contacts to the Resource Manager(Application Manager) to get the application’s running status, health condiction and so on;</li>
+<li>As soon as the application finishes, Application Master unregisters to the Resource Manager and shut down the connection, and all the Containers will also be free.</li>
+</ul>
+<h2 id="Scheduling-in-YARN"><a href="#Scheduling-in-YARN" class="headerlink" title="Scheduling in YARN"></a>Scheduling in YARN</h2><p>Scheduling is one of the most important points in YARN. As we talked about in the Resouce Manager, the Scheduler in RM is responsible for scheduling, and actully there are mainly three kinds of scheduler in YARN, which are <strong>FIFO</strong>, <strong>capacity</strong> and <strong>fair</strong> scheduler. The figure below presents the differences among them.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/23/23-2.png" alt=""></p>
+<h3 id="FIFO-Scheduler"><a href="#FIFO-Scheduler" class="headerlink" title="FIFO Scheduler"></a>FIFO Scheduler</h3><p>As name presents, FIFO, abbr of <em>firt in first out</em>, is the most basic scheduler, the submitted applications are all in a queue and executed one by one in order. The drawback is pretty significant, as shown in the figure, the whloe queue could be easily blocked by the <strong>BIG</strong> applications. Big application always need more time to be executed and the whole queue have to be waiting for the big application execution.</p>
+<h3 id="Capacity-Scheduler"><a href="#Capacity-Scheduler" class="headerlink" title="Capacity Scheduler"></a>Capacity Scheduler</h3><p>Capacity schdeuler can solve the blocked queue problem in FIFO in some terms. Capacity Scheduler devide the source into multiple queues and some of them are for big applications specifically. Big applications in Capacity take less resource than in the FIFO, which makes the big application take longer time to execute in Capacity Scheduler.</p>
+<h3 id="Fair-Scheduler"><a href="#Fair-Scheduler" class="headerlink" title="Fair Scheduler"></a>Fair Scheduler</h3><p>Hence neither FIFO nor Capacity are good enough for Scheduling, the Fair Scheduler are proposed and it’s the most popular scheduler in YARN at present. Similar to the Capacity Scheduler, Fari also divide the cluster into multiple queues. However, the capacity, or the resource, of each queues is dynamical. Also the fraction of the queue source deviding can be modified in configuration.<br>Suppose we have two queues, which are A and B, and the YARN is configured to Fari Scheduler. A start the application when B is free, then A can take over all the resource of queue B, but when B start an application while A is free, B can also take over all the resource. The key point of Fair Scheduler is that the resouce is fairly shared for all queues. </p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://www.edureka.co/blog/hadoop-yarn-tutorial/" target="_blank" rel="noopener">Hadoop YARN Tutorial – Learn the Fundamentals of YARN Architecture</a></li>
+<li><a href="https://data-flair.training/blogs/hadoop-yarn-resource-manager/" target="_blank" rel="noopener">Hadoop YARN Resource Manager – A Yarn Tutorial</a></li>
+<li><a href="http://timepasstechies.com/hadoop-yarn-concept-fifocapacity-fair-scheduling/" target="_blank" rel="noopener">Hadoop Yarn Concept with Fifo, Capacity and Fair Scheduling</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/hdfs/">#hdfs</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/yarn/">#yarn</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2019/06/22/hdfs-orc-tips/">ORC Stored HIVE Tips</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2019/05/05/hdfs-arvo-parquet-orc/">Arvo, Parquet and ORC</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2019/06/11/hdfs-yarn-architecture/';
+        this.page.identifier = '2019/06/11/hdfs-yarn-architecture/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

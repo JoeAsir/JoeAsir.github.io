@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Spark Tips Sum-up Part-2 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#Coalesce">1&nbsp;&nbsp;<b>Coalesce</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Read-ORC-Table">2&nbsp;&nbsp;<b>Read ORC Table</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Reference">3&nbsp;&nbsp;<b>Reference</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Spark Tips Sum-up Part-2
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2018-10-13T01:53:02.000Z" itemprop="datePublished">Oct 13 2018</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/spark/">spark</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 minutes read (About 854 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/boulders-calm-conifers-426894.jpg" alt=""><br>This article presents some tips of Apache Spark, which is part 2 of the series. All the tips below are based on the real problems which I met. Despite the background, the tips below are of valuable reference. I’ve tried a lot to learn about Apache Spark but can’t know the detail of every part of it. I’d appreciate it if you figure out the mistakes in this article.<br><a id="more"></a></p>
+<h2 id="Coalesce"><a href="#Coalesce" class="headerlink" title="Coalesce"></a>Coalesce</h2><p>Changing the number of partitions could benefit the performance of your Spark application. A large number of partitions may increase the parallelism of the process while too many tasks would be executed on a single executor, which could cost more running time. In contrast, a small number of partition might improve the complexity of each task and slow down the whole process. To solve this trade-off problem, <em>repartition()</em> and <em>coalesce()</em> is proposed in Apache Spark.<br>Before talking about the detail about <em>coalesce()</em>, let’s review the concept of transformation with wide-dependencies and narrow-dependencies.</p>
+<blockquote>
+<ul>
+<li>Wide-dependencies: each partition of the parent RDD is used by at most one partition of the child RDD.</li>
+<li>Narrow-dependencies: multiple child partitions may depend on each partition in the parent RDD.</li>
+</ul>
+</blockquote>
+<p>According to the definition above, <em>repartition()</em> is a typical transformation with wide-dependencies and thus can bring in shuffle operation when triggered. But what about <em>coalesce()</em>? To find out more about it, let’s see the definition first.<br><figure class="highlight scala hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// coalesce() for RDD is defined in org.apache.spark.rdd.RDD</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">coalesce</span></span>(numPartitions: <span class="hljs-type">Int</span>, shuffle: <span class="hljs-type">Boolean</span> = <span class="hljs-literal">false</span>,</span><br><span class="line">    partitionCoalescer: <span class="hljs-type">Option</span>[<span class="hljs-type">PartitionCoalescer</span>] = <span class="hljs-type">Option</span>.empty) </span><br><span class="line">    (<span class="hljs-keyword">implicit</span> ord: <span class="hljs-type">Ordering</span>[<span class="hljs-type">T</span>] = <span class="hljs-literal">null</span>)</span><br><span class="line">   : <span class="hljs-type">RDD</span>[<span class="hljs-type">T</span>] = withScope &#123;...&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// coalesce() for Dataset is defined in org.apache.spark.sql.Dataset</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">coalesce</span></span>(numPartitions: <span class="hljs-type">Int</span>): <span class="hljs-type">Dataset</span>[<span class="hljs-type">T</span>] = withTypedPlan &#123;</span><br><span class="line">    <span class="hljs-type">Repartition</span>(numPartitions, shuffle = <span class="hljs-literal">false</span>, logicalPlan)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>For RDDs, <em>coalesce()</em> has a boolean typed parameter called <em>shuffle</em>. The <em>coalesce()</em> can be treated as <em>repartition()</em> as <em>shuffle</em> is set to <em>True</em>, which is a transformation with wide-dependencies. In contrast, when <em>shuffle</em> is <em>False</em>, <em>coalesce()</em> is a transformation with narrow-dependencies and only can reduce the number of partitions, which means you cannot increase the number of partitions by setting the parameter <em>numPartitions</em>. As for DataFrame/Dataset API, <em>coalesce()</em> is a transformation with narrow-dependencies as there is no shuffle operation at all. As results, <em>coalesce()</em> cannot increase the number of DataFrame/Dataset’s partitions and can only be used to reduce DataFrame/Dataset’s partitions.<br>After understanding the above, there is a crucial tip for you. When you use <em>coalesce()</em> and reduce the number of partitions, which may cause a problem that the partition of the whole stage would be decreased and the computation could be even slower than you expect. since no shuffle operation performed, the stage executes with the level of parallelism assigned by <em>coalesce()</em>. To avoid this problem, you can set <em>shuffle=True</em> for RDDs or use <em>repartition()</em> instead for DataFrame/Dataset to split the whole stage by a shuffle.</p>
+<h2 id="Read-ORC-Table"><a href="#Read-ORC-Table" class="headerlink" title="Read ORC Table"></a>Read ORC Table</h2><p>Reading data from and writing data to HIVE tables is quite often when I use Apache Spark. And we are now using ROC format to store HIVE table.</p>
+<blockquote>
+<p>ORC is a self-describing type-aware columnar file format designed for Hadoop workloads. It is optimized for large streaming reads, but with integrated support for finding required rows quickly. </p>
+</blockquote>
+<p>Generally, when Spark reads data from HDFS, the initial number of partitions are determined by the number of blocks of data store in HDFS, with one block represents one partition in Spark. However, when I read the ORC format HIVE table, the partition number is equal to the number of files stored on HDFS, not number block. That’s caused by ORC split strategy set by <em>hive.exec.orc.split.strategy</em>, which determines what strategy ORC should use to create splits for execution. The available option includes “BI”, “ETL” and “HYBRID”</p>
+<blockquote>
+<p>The HYBRID mode reads the footers for all files if there are fewer files than expected mapper count, switching over to generating 1 split per file if the average file sizes are smaller than the default HDFS block size. ETL strategy always reads the ORC footers before generating splits, while the BI strategy generates per-file splits fast without reading any data from HDFS.</p>
+</blockquote>
+<p>As results, when the split strategy is set to ETL, Spark would take more time to generate tasks and the number of partitions is based on the size of HDFS blocks. In contrast, BI strategy would make Spark generate tasks immediately and the number of tasks is equal to the number of files of HIVE table. These two strategies seem to be a trade-off for us and it’s better for us to decide by the actual situation.  </p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://hackernoon.com/managing-spark-partitions-with-coalesce-and-repartition-4050c57ad5c4" target="_blank" rel="noopener">Managing Spark Partitions with Coalesce and Repartition</a></li>
+<li><a href="http://opencarts.org/sachlaptrinh/pdf/28044.pdf" target="_blank" rel="noopener">High Performence Spark</a></li>
+<li><a href="https://orc.apache.org/" target="_blank" rel="noopener">Apache ORC</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.exec.orc.split.strategy" target="_blank" rel="noopener">Apache ORC Configuration Properties</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/spark/">#spark</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2018/11/14/spark-second-generation-tungsten-in-spark/">Second Generation Tungsten Engine in Spark 2.x</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2018/09/25/spark-catalyst-optimization/">Catalyst Optimization in Spark SQL</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2018/10/13/spark-sumup-part-2/';
+        this.page.identifier = '2018/10/13/spark-sumup-part-2/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>HDFS Architecture - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#Namenode">1&nbsp;&nbsp;<b>Namenode</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#FsImage-amp-EditLogs">1.1&nbsp;&nbsp;FsImage &amp;amp;amp; EditLogs</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Secondary-Namenode-Checkpoint-Node-amp-Backup-Node">1.2&nbsp;&nbsp;Secondary Namenode(Checkpoint Node) &amp;amp;amp; Backup Node</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Datanode">2&nbsp;&nbsp;<b>Datanode</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Block-amp-Replica">3&nbsp;&nbsp;<b>Block &amp;amp;amp; Replica</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Block">3.1&nbsp;&nbsp;Block</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Replication-Management-via-Rack-Awareness">3.2&nbsp;&nbsp;Replication Management via Rack Awareness</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Read-amp-Write">4&nbsp;&nbsp;<b>Read &amp;amp;amp; Write</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Read-Operation">4.1&nbsp;&nbsp;Read Operation</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Write-Operation">4.2&nbsp;&nbsp;Write Operation</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#References">5&nbsp;&nbsp;<b>References</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            HDFS Architecture
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-04-28T10:25:30.000Z" itemprop="datePublished">Apr 28 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/hadoop/">hadoop</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 minutes read (About 1851 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/clouds-dark-dark-clouds-2308671.jpg" alt=""><br>I’ve been using HDFS as storage for almost 3 years reading data from and writing data to it by HIVE and Spark, but I’ve never learned the detail. Finally I have some time to watch the <a href="https://www.coursera.org/learn/big-data-essentials/" target="_blank" rel="noopener">Big Data Essentials</a> on <a href="https://www.coursera.org/" target="_blank" rel="noopener">Coursera</a>, which inspired me to have a deep dive in HDFS architecture. This blog contains so much about HDFS that I spent 3 days to sum up and mark them down. If anything is worng, it’s very nice of you to tell me and I’ll figure it out! Let’s take a look.<br><a id="more"></a></p>
+<h2 id="Namenode"><a href="#Namenode" class="headerlink" title="Namenode"></a>Namenode</h2><p>Namenode is the <strong>master node</strong> of the HDFS, it contains the metadata of the filesystem, such as the number and location of the block, replica and so on. Notice the metadata is stored in-memory for the fast retrival of data.</p>
+<blockquote>
+<p>Task of Namenode</p>
+<ul>
+<li>Manage file system namespace.</li>
+<li>Regulates client’s access to files.</li>
+<li>It also executes file system execution such as naming, closing, opening files/directories.</li>
+<li>All DataNodes sends a Heartbeat and block report to the NameNode in the Hadoop cluster. It ensures that the DataNodes are alive. A block report contains a list of all blocks on a datanode.</li>
+<li>NameNode is also responsible for taking care of the Replication Factor of all the blocks.</li>
+</ul>
+</blockquote>
+<h3 id="FsImage-amp-EditLogs"><a href="#FsImage-amp-EditLogs" class="headerlink" title="FsImage &amp; EditLogs"></a>FsImage &amp; EditLogs</h3><p>The HDFS Namenade, as the Master Node, manages the whole architecture of the filesystem by the metadata. Data in the metadata are present as FsImage and EditLogs. Let’s the detail about them.</p>
+<ul>
+<li><p>FsImage: FsImage contains the image of the entire filesystem, including serialized form of all the <strong>directories</strong> and file <strong>inodes</strong>. The FsImage is actually stored as a <strong>local file</strong> in the filesystem in Namenode and actually, you can treat FsImage as a snapshot of the present filesystem architecture.</p>
+<blockquote>
+<p>Each inode is an internal representation of file or directory’s metadata.  </p>
+</blockquote>
+<ul>
+<li>EditLogs: Editlogs contains the modification made to the entire filesystem on the most recently FsImage, such as creating, moving, updating, deleting and so on. Also, EditLogs is stored on the Namenode as a local file, similar to the FsImage.</li>
+</ul>
+</li>
+</ul>
+<p>As you may get it, FsImage and EditLogs, one for storing the present situation and one for the modification. With the help of these two files, Namenode could can recover the matadata in case of something unexpected. Let’s go ahead to the specific strategy.</p>
+<h3 id="Secondary-Namenode-Checkpoint-Node-amp-Backup-Node"><a href="#Secondary-Namenode-Checkpoint-Node-amp-Backup-Node" class="headerlink" title="Secondary Namenode(Checkpoint Node) &amp; Backup Node"></a>Secondary Namenode(Checkpoint Node) &amp; Backup Node</h3><p>FsImage and EditLogs can help us recover the entire HDFS, but is there any problem? Suppose the Namenode has been running for a month, and once it restarted, the Namenode would read the FsImage and EditLogs to rebuild the state of the HDFS. However, since the Namenode has been running for such a long time that the EditLogs could be so large that it would spend a long time to load and parse, even for few hours, which is unacceptable for us. To solve this problem, let’s have a look at the Secondary Namenode and Backup Node.</p>
+<ul>
+<li>Secondary Namenode(Checkpoint Node): Secondary Namenode runs on another machine apart from the Namenode, it <strong>fetches the FsImage and EditLogs periodically</strong> from the Namenode and merge them to a start-of-art FsImage, aka a checkpoint, and push it back to the Namenode(it may be little confusing that so-called Secondary Namenode would not upload the checkpoint automaticlly while the checkpoint Node would, I’m not quite sure about it actually). </li>
+<li>Backup Node: Take care that Backup Node is a different term from Secondary Namenode or Checkpoint Node. Backup Node doesn’t fetch the FsImage and EditLogs periodically because it receive a filesystem edit stream from the Namenode. As a result, the state image is always stored <strong>in-memory</strong> on the Backup Node.<blockquote>
+<p>The Backup Node provides the same functionality as the Checkpoint Node, but is synchronized with the NameNode. </p>
+</blockquote>
+</li>
+</ul>
+<h2 id="Datanode"><a href="#Datanode" class="headerlink" title="Datanode"></a>Datanode</h2><p>Datanode is the <strong>slaver node</strong> of HDFS, which is actually where the data stored.</p>
+<blockquote>
+<p>Tasks of Datanode </p>
+<ul>
+<li>Block replica creation, deletion, and replication according to the instruction of Namenode.</li>
+<li>DataNode manages data storage of the system.</li>
+<li>DataNodes send heartbeat to the NameNode to report the health of HDFS. By default, this frequency is set to 3 seconds.</li>
+</ul>
+</blockquote>
+<h2 id="Block-amp-Replica"><a href="#Block-amp-Replica" class="headerlink" title="Block &amp; Replica"></a>Block &amp; Replica</h2><h3 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h3><p>Block is unit of data stored on HDFS, which cannot be controlled by us and the value is often 128M by default. Why we need data block? Suppose we have two files stored on the HDFS, one is bigger, 1G for instance, and another is 129M. As these two files been read synchronously, it could be an imbalanced progress. But what if we split all the files to a same unit size and these splitted units would be read in balance. That’s why we need data block in HDFS.<br>Since we’ve learnt why we need data block, you may ask, why is data block 128M? When files splitted by data block size, instead of one huge single file, few small chunks are stored on HDFS, and the main information of these chunks, aka metadata, are stored in-memory on the Namenode, including block size, block location and so on. So if the block size is too small that the chunks would be too many, then the Namenode in-memory stroage would be under great pressure. And that’s also why the <strong>small files problem</strong> damage to your HDFS. However, on the other hand, too large block size would make the reading data process on datanode slow, which is not a good situation for HDFS. It’s a trade-off, and that’s why we choose 128M as an eclectic solution for HDFS. </p>
+<h3 id="Replication-Management-via-Rack-Awareness"><a href="#Replication-Management-via-Rack-Awareness" class="headerlink" title="Replication Management via Rack Awareness"></a>Replication Management via Rack Awareness</h3><p>As written to the HDFS, a single file would be divided into many blocks and these blocks would be stored across the cluster, at the same time, the replica of each block is created and there are 3 replicas by default which is can be modified in setting. The replica is actually the backup data from the blocks in case of the potentially unfavorable conditions of the Datanode, aka HDFS fault tolerance. Let’s take a look at how HDFS manage the replication under the rack awareness.<br>Every Datanode in a cluster is actually a single machine, and several Datanodes are put on one rack for better management and they share the network. Several racks are set in one data center and one cluster may be built across several data centers, which could be in different areas even counties, as results, the network distance between each nodes are different. See the figure below.<br>When the cluster start to write data to the HDFS, Namenode chooses the Datanode which is closer to the same rack or nearby rack to the write request. This distance is calculated by the rules below. Rack Awareness will choose the Datanode which is closer to get rid of too much network commuication cost.</p>
+<ul>
+<li>Distance is 0 when data in the same node;</li>
+<li>Distance is 2 when data in two different nodes but the same rack;</li>
+<li>Distance is 4 when data in two different racks but the same data center;</li>
+<li>Distance is 6 when data in two different data centers.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/21/21-1.png" alt=""></li>
+</ul>
+<p>Via Rack Awareness, Namenode will not only choose the namenode to store the data, but also the replicas. Let’s make a sample with one data block, once the data block has been already stored on the Datanode, the first replica will be stored in the local Datanode, then the second replica will be cast to another Datanode in the different rack and the third replica will be stored at the different Datanode on the local rack of the second replica.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/21/21-2.png" alt=""></p>
+<blockquote>
+<p>A simple but nonoptimal policy is to place replicas on the different racks. This prevents losing data when an entire rack fails and allows us to use bandwidth from multiple racks while reading the data. This policy evenly distributes the data among replicas in the cluster which makes it easy to balance load in case of component failure. But the biggest drawback of this policy is that it will increase the cost of write operation because a writer needs to transfer blocks to multiple racks and communication between the two nodes in different racks has to go through switches.</p>
+</blockquote>
+<h2 id="Read-amp-Write"><a href="#Read-amp-Write" class="headerlink" title="Read &amp; Write"></a>Read &amp; Write</h2><h3 id="Read-Operation"><a href="#Read-Operation" class="headerlink" title="Read Operation"></a>Read Operation</h3><ol>
+<li>Client opens the file by the <em>DistributedFileSystem</em> object;</li>
+<li><em>DistributedFileSystem</em> calls the Namenode via RPC and get the blocks and replicas location according to the distance between datanode and client, and a <em>FSDataInputStream</em> is also returned;</li>
+<li>With the address of Datanotes, <em>FSDataInputStream</em> open the I/O stream and bring data from Datanodes back to the client;</li>
+<li>Once the reading is finished, client will call <em>close()</em> to end up the stream.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/21/21-3.png" alt=""></li>
+</ol>
+<blockquote>
+<p>If the <em>DFSInputStream</em> encounters an error while communicating with a datanode, it will try the next closest one for that block. It will also remember datanodes that have failed so that it doesn’t needlessly retry them for later blocks. The <em>DFSInputStream</em> also verifies checksums for the data transferred to it from the datanode. If it finds a corrupt block, it reports this to the namenode before the <em>DFSInputStream</em> attempts to read a replica of the block from another datanode.</p>
+</blockquote>
+<h3 id="Write-Operation"><a href="#Write-Operation" class="headerlink" title="Write Operation"></a>Write Operation</h3><ol>
+<li>Client sends a <strong>create</strong> request on the <em>DistributedFileSystem</em>, and <em>DistributedFileSystem</em> makes a RPC call to the Namenode to create a new file in the filesystem’s namespace, and Namenode would check for the file names, permission and so on. And a <em>FSDataOutputStream</em> containing the Datanode location is returned by the Namenode if everything is OK;</li>
+<li><em>FSDataOutputStream</em> would split the data into packets and make them a queue, aka data queue, consumed by the <em>DataStreamer</em>, which would allocate new blocks by picking a list of suitable Datanodes to store the replica from the Namenode;</li>
+<li>Assume that the replication factor is set to 3, the list of Datanodes form a pipeline containing 3 Datanodes(the first replica is stored in the local Datanode, so there are 3 Datanodes instead of 4);</li>
+<li><em>DataStreamer</em> streams the packet to the first Datanode in the pipeline and then forwards it to the second one, then the third one.</li>
+<li><em>FSDataOutputStream</em> also maintains an interal queue of packets waiting for the acknowledge by Datanodes. Once the acknowledge is send from Datanode in the pipeline, which is sent when the block is stored and the replicas are created, the packet is removed from the packet queue.</li>
+<li>All the blocks are stored and replicated on the different datanodes, the data blocks are copied in parallel.</li>
+<li><p>Client calls <em>close()</em> when writing operation finished.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/21/21-4.png" alt=""></p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://morrisjobke.de/2013/12/11/Hadoop-NameNode-and-siblings/" target="_blank" rel="noopener">Hadoop - NameNode, Checkpoint Node and Backup Node</a></li>
+<li><a href="https://data-flair.training/blogs/hadoop-hdfs-architecture/" target="_blank" rel="noopener">Hadoop HDFS Architecture Explanation and Assumptions</a></li>
+<li><a href="https://www.coursera.org/learn/big-data-essentials/" target="_blank" rel="noopener">Big Data Essentials: HDFS, MapReduce and Spark RDD</a></li>
+</ul>
+</li>
+</ol>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/hdfs/">#hdfs</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/hadoop/">#hadoop</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2019/05/05/hdfs-arvo-parquet-orc/">Arvo, Parquet and ORC</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2019/03/06/spark-sumup-part-3/">Spark Tips Sum-up Part-3</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2019/04/28/hdfs-architecture/';
+        this.page.identifier = '2019/04/28/hdfs-architecture/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Imbalanced data 问题总结方法汇总 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Imbalanced data 问题总结方法汇总
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2017-11-11T15:01:09.000Z" itemprop="datePublished">Nov 11 2017</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/machine-learning/">machine learning</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            9 minutes read (About 1387 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>Hello，大家好，双十一真的很累，一直在加班，忙里偷闲看了<a href="https://arxiv.org/pdf/1710.05381.pdf" target="_blank" rel="noopener">A systematic study of the class imbalance  problem in convolutional neural networks</a>，感觉paper呈现的研究内容感觉很一般，但是，paper中关于imbalanced data的solution方法倒是写的很不错，也勾起了我对于这一块总结的欲望。之前也写过一篇关于imbalanced data的paper notes，但是对于这一块的具体方法总结还不是很足够，于是用这篇paper为主线好好sum up一计。</p>
+<p>我们来一起看看。<br><a id="more"></a></p>
+<h2 id="Data-level-methods"><a href="#Data-level-methods" class="headerlink" title="Data level methods"></a>Data level methods</h2><p>首先我们来看一看data level methods，这类方法有一个共性，那就是通过改变data的数量来完成对imbalanced data problem的解决。</p>
+<h3 id="Oversampling"><a href="#Oversampling" class="headerlink" title="Oversampling"></a>Oversampling</h3><p>Oversampling可以说是最直观的solution之一，它的核心思想是，对于较少一类别的samples，过此重复采样，以此让两种类别的样本接近平衡。<strong>但是，对于一个sample多次重复训练，很有可能带来overfitting</strong>，因此，简单粗暴的重复采样并不可取。因此，很多改进的版本应运而生：</p>
+<h4 id="SMOTE"><a href="#SMOTE" class="headerlink" title="SMOTE"></a>SMOTE</h4><p>SMOTE算法是一种经典的oversampling方法，它的主要思想是对较少数目类别的样本，随机抽取\(m\)个样本，对于随机抽取出的样本，每个样本选取距离最近的\(n\)个样本，在他们的连线上随机选取一个点，作为较少类别的补充样本。假设原样本点为\(x\)，被选中的附近的点为\(x’\)，则新的样本点为：<br>$$x_{new}= x + rand(0,1) \cdot |x-x’|$$</p>
+<p>通过这种方式，SMOTE可以对较少类别样本进行扩充，进而实现oversampling，平衡数据分布。</p>
+<h4 id="Cluster-base-oversampling"><a href="#Cluster-base-oversampling" class="headerlink" title="Cluster-base oversampling"></a>Cluster-base oversampling</h4><p>Cluster-based方法的最大特点莫过于最开始对数据进行一个聚类分析，数据会变成数个cluster，然后对于每一个cluster在进行数据的oversampling，<strong>同时兼顾类别之间的between-class imbalance，还要考虑到类内部各个cluster的within-class imbalance</strong>.</p>
+<blockquote>
+<p>Its idea is to consider not only the between class imbalance (the imbalance occurring between the two classes) but also the with in class imbalance (the imbalance occurring between the sub clusters of each class) and to oversample the data set by rectifying these two types of imbalances simultaneously.</p>
+</blockquote>
+<p>原paper大致叙述了整个流程，首先我们对imbalanced data进行k-means(或者其他算法也可以)聚类，聚成多个cluster之后，我们开始进行oversampling，假设majority class有\(m\)个cluster，minority有\(n\)个cluster，我们以cluster最大的data数目\(k\)为标准，我们先对majority class中所有cluster，都进行oversampling，使得他们的数目都达到\(k\)，随后，对于minority中每个cluster进行oversampling，使得每一个cluster数目变成\(m * k /n\)，最终实现between-class balance和within-class balance.</p>
+<h3 id="Undersampling"><a href="#Undersampling" class="headerlink" title="Undersampling"></a>Undersampling</h3><p>与oversampling相对应的则是undersampling，undersampling的核心思想是对于较多类别的samples抽样，使得两个类别数据趋于相近。但是，随机抽样获得会使得类别丧失很多的信息，甚至导致数据分布发生改变。</p>
+<h4 id="One-sided-selection"><a href="#One-sided-selection" class="headerlink" title="One-sided selection"></a>One-sided selection</h4><p>one-sided selection的主要思想是，为了保证数据整体的分布，我们优先去除靠近边界的样本，这样可以保证较多分类的数据分布。</p>
+<h2 id="Classifier-level-methods"><a href="#Classifier-level-methods" class="headerlink" title="Classifier level methods"></a>Classifier level methods</h2><p>下面我们来看看通过改变classifier level来解决imbalanced data的方法，这类方法侧重于分类器本身的一些性质而并非两类数据的个数。</p>
+<h3 id="Thresholding"><a href="#Thresholding" class="headerlink" title="Thresholding"></a>Thresholding</h3><p>我在之前的博客中聊到过，imbalanced data的分类平面会倾向于较少数据的分类一侧，所以我们可以通过改变类别预测的probabilty的threshold来修正分类平面。常用的方法就是加入关于类别数目的prior probability：<br>$$y_i(x)=p(i|x)= \frac{p(i) \cdot p(x|i)}{p(x)}$$</p>
+<h3 id="Cost-sensitive-learning"><a href="#Cost-sensitive-learning" class="headerlink" title="Cost sensitive learning"></a>Cost sensitive learning</h3><p>Thresholding方法其实对已经train好的模型的采取的一种方式。相应的，我们在模型训练的时候就来消除imbalanced data的一些影响，如何做到呢？答案就是cost function.</p>
+<p>我们可以通过调整learning rate，加强对cost比较大的samples，并且最终的优化目标从标准的cost function变成misclassification cost，如此就可以解决imbalanced data的问题了</p>
+<h3 id="One-class-classification"><a href="#One-class-classification" class="headerlink" title="One-class classification"></a>One-class classification</h3><p>该方法可以说是换了一种思维看问题，我们不再将classification作为我们的task，而是变成了对于一种异常检测的问题。我们只是着眼于较多samples的类别，认为另一类别的samples是一种异常值。</p>
+<p>当然，这种方法适合那种极端的imbalanced data，对于一般的情况并不一定很适用。</p>
+<h2 id="Recommendation"><a href="#Recommendation" class="headerlink" title="Recommendation"></a>Recommendation</h2><p>Projection:<a href="https://github.com/scikit-learn-contrib/imbalanced-learn" target="_blank" rel="noopener">Imbalanced-learn</a></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://arxiv.org/pdf/1710.05381.pdf" target="_blank" rel="noopener">Buda, Mateusz, Atsuto Maki, and Maciej A. Mazurowski. “A systematic study of the class imbalance problem in convolutional neural networks.” arXiv preprint arXiv:1710.05381 (2017).</a></li>
+<li><a href="https://www.jair.org/media/953/live-953-2037-jair.pdf" target="_blank" rel="noopener">Chawla, Nitesh V., et al. “SMOTE: synthetic minority over-sampling technique.” Journal of artificial intelligence research 16 (2002): 321-357.</a></li>
+<li><a href="http://sci2s.ugr.es/keel/pdf/specific/articulo/jo.pdf" target="_blank" rel="noopener">Jo, Taeho, and Nathalie Japkowicz. “Class imbalances versus small disjuncts.” ACM Sigkdd Explorations Newsletter 6.1 (2004): 40-49.</a></li>
+<li><a href="http://www.ee.iisc.ac.in/new/people/faculty/prasantg/downloads/NeuralNetworksPosteriors_Lippmann1991.pdf" target="_blank" rel="noopener">Richard, Michael D., and Richard P. Lippmann. “Neural network classifiers estimate Bayesian a posteriori probabilities.” Neural computation 3.4 (1991): 461-483.</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/imbalanced-data/">#imbalanced data</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2017/11/26/course-deep-learning-course4-week1/">Learning Notes-Deep Learning, course4, week1</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/10/22/paper-swish/">Reading Notes-Swish：A Self-gated Activation Function</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2017/11/11/ml-imbalanced-data-solution/';
+        this.page.identifier = '2017/11/11/ml-imbalanced-data-solution/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

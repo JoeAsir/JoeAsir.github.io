@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Java Garbage Collection Overview - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#GC-overview">1&nbsp;&nbsp;<b>GC overview</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#GC-Process">2&nbsp;&nbsp;<b>GC Process</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#JVM-Generations">2.1&nbsp;&nbsp;JVM Generations</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Young-Generation">2.2&nbsp;&nbsp;Young Generation</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Old-Generation">2.3&nbsp;&nbsp;Old Generation</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Stop-the-wordld-STW">2.4&nbsp;&nbsp;Stop-the-wordld(STW)</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Java-Garbage-Collector">3&nbsp;&nbsp;<b>Java Garbage Collector</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Conclusion">4&nbsp;&nbsp;<b>Conclusion</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#References">5&nbsp;&nbsp;<b>References</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java Garbage Collection Overview
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-02-26T08:35:08.000Z" itemprop="datePublished">Feb 26 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/jvm/">jvm</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            9 minutes read (About 1402 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/beach-boats-clouds.jpg" alt=""><br>Java Garbage Collection has confused me for such a long time when I try to tune my Spark Application, but unfortunately I’m not a good Java developer. I really feel terrible when staring at the red blocks representing high GC time in my SparkUI while having no idea how to fix it up. So I spent some time digging in GC and finally got to learn about what GC is and how to analysis the GC logs. So today I’m sharing you something I learnt and let’s move on.<br><a id="more"></a><br>Just as name presenting, Java Garbage Collection is used to collect the garbage, which is actually the unused objects, in JVM Heap memory. If you don’t know what does Heap memory represents, you’d better make sense of JVM memory management first.</p>
+<h2 id="GC-overview"><a href="#GC-overview" class="headerlink" title="GC overview"></a>GC overview</h2><p>Let’s firstly take a quick look at on how GC track and remove the so-called grabage. The whole porcess, consisting of two steps, marking and deletion, might be much simpler than you can imagine.</p>
+<ul>
+<li>Marking - It’s easy to understand what <strong>Marking</strong> does if you know what GC does. Yep! <strong>Marking</strong> is purposed to distingrish and mark down which objects are still referenced and which are to be collected. And it’s a time consuming process for all the objects all scanned.</li>
+<li>Deletion - <strong>Deleteing</strong> removes the unreferenced objects by moving the referenced objects together, it compact the memory to make benefis to the further memory allocation.</li>
+</ul>
+<h2 id="GC-Process"><a href="#GC-Process" class="headerlink" title="GC Process"></a>GC Process</h2><h3 id="JVM-Generations"><a href="#JVM-Generations" class="headerlink" title="JVM Generations"></a>JVM Generations</h3><p>The Heap memory in JVM is devided into manly three parts, which are Eden, Survivor and Tenured Space(and Permanet space in formal JDK version). Eden and Survivor spaces are called Yong Generation while the Tenured space Old Generation. I have to say the names of JVM Generations are really vivid, the Young Generation is where all the new objects allocated, and Old Generation is used to store long-living objects.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/20/20-1.png" alt=""></p>
+<h3 id="Young-Generation"><a href="#Young-Generation" class="headerlink" title="Young Generation"></a>Young Generation</h3><p>There are two parts of Heap spaces in Young Generation, which are Eden and Survivor spaces as we talked above. And the Survivor space is actually made up with two parts, Survivor 0 and Survivor 1, aka “from” Survivor and “to” Survivor, or s0 and s1. The key point is that, those two Survivors space are not immutable as Eden space, actually they are relative just as the name “from” and “to” shows. Once an object is first allocated, it wil be stored in the Eden space. Time goes by, the Eden space is gradually filled up with so many new-born objects, then the <strong>Minor Garbage Collection(Minor GC)</strong> is triggered. Hey, you see? the <strong>Minor GC</strong> finally comes out here and it’s actually the GC process in the Young Generation.<br>In the <strong>Minor GC</strong> process, all the unreferenced or unused objects are removed, and all the referenced ones are moved to one of the Survivor spaces, which is actually the “from” Survivor space. As new objects are continuously born(or allocated), with the Eden space gradually filled up with those objects again, the <strong>Minor GC</strong> is triggered another time, all the unreferenced objects in the Eden space and “from” Survivor space are all removed while the referenced ones are moved to the “to” Survivor space. That’s why the two Survivor spaces are called “from” and “to”, really vivid, isn’t it? Hahaha. The survived objects(stored in Survivor space) are moved between these two Survivors space gathering with new-born ones moved from the Eden It’s interesting to find out that the “from” Survivor space will be called as “to” Survivor space in the next data moving time, which always keep the survived objects are all stored in one Survivor, whil another empty.<br>Once the referenced objects are moved, they are also aged once. As soon as the age of the objects reach a certain threshold(15 as the default value, and you can custom it as you wish), they would be moved to a new world, that’s the Old Generation(this moving stage is aka so-called promotion), which I’m about to talk below.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/20/20-2.png" alt=""></p>
+<h3 id="Old-Generation"><a href="#Old-Generation" class="headerlink" title="Old Generation"></a>Old Generation</h3><p>As we talked above, when referenced objects are “old” enough(couldn’t stop laughing), or one of the Survivor space is full-filled, they will be then promoted to the the Tenured space, which means the long-time survived objects will be stored in the Old Generation. As <strong>Minor GC</strong> keeps invoked once again and again, survived objects will be continuous promoted to the Old Generation. And the <strong>Major Garbage Collection(Major GC)</strong> would be triggered eventually on the Old Generation to clean up and compact that space.<br>What’s more, what if the Old Generation is full? Wow, that’s really not a good news for your JVM application because the <strong>Full Garbage Collection(Full GC)</strong> is triggered, which clean up all the objects on <strong>both</strong> the Young Generation and Old Generation.<br>I have to say that there is no brief definitions for <strong>Major GC</strong> and <strong>Full GC</strong>, which really confuses me, see more details in <a href="https://plumbr.io/blog/garbage-collection/minor-gc-vs-major-gc-vs-full-gc" target="_blank" rel="noopener">this blog</a>.</p>
+<h3 id="Stop-the-wordld-STW"><a href="#Stop-the-wordld-STW" class="headerlink" title="Stop-the-wordld(STW)"></a>Stop-the-wordld(STW)</h3><p>Now we almostly get the generatinal garbage collection process of JVM GC, but why we foucs a lot on it, and how does it ruins our application? The answer is quite simple, that is <strong>Stop-the-world</strong> aka STW. Once a GC process triggered, the JVM has to move and update those references object before the application manipulate them, otherwise there could be something wrong. <a href="https://stackoverflow.com/questions/40182392/does-java-garbage-collect-always-has-to-stop-the-world" target="_blank" rel="noopener">See this answers on Stackoverflow to learn more</a>.<br>Actually, all the GC process could bring in STW problem, and especially for <strong>Full GC</strong> process, which could be a nightmare your application proformance. </p>
+<h2 id="Java-Garbage-Collector"><a href="#Java-Garbage-Collector" class="headerlink" title="Java Garbage Collector"></a>Java Garbage Collector</h2><ul>
+<li><p>Serial Garbage Collector<br>As name presents, Serial Garbage Collector is basicaly works with a single thread. Serial Garbage Collector would stop all the other application threads because of the memory compaction, also known as the <strong>STW</strong> we talked about.  As a result, Serial Garbage often be used in the applications without low pause time requirements and run on client-style machines.</p>
+</li>
+<li><p>Parallel Garbage Collector<br>Instead of the single thread in Serial Garbage Collector, Parallel Garbage Collector uses multiple threads to preform GC. And Parallel Collector could also bring the <strong>STW</strong> as the Serial Garbage Collector does. </p>
+</li>
+<li><p>CMS Garbage Collector<br>The Concurrent Mark Sweep Garbage Collector, aka CMS, uses multiple garbage collector threads to reduce the pauses time in application when collecting Old Generation. Normally the CMS Garbage Collector dosen’t compact the memory and move the referenced objects together after collection, thus that’s the mainly disadvtange of CMS.</p>
+</li>
+<li><p>G1 Garbage Collector<br>Garbage First or G1 Collector is purposed to be the alternative of CMS Garbage Collector. G1 Collector seems to be a perfect choice as it’s a parallel, concurrent and compacting low-pause collector.</p>
+</li>
+</ul>
+<blockquote>
+<p>Unlike other collectors, G1 collector partitions the heap into a set of equal-sized heap regions, each a contiguous range of virtual memory. When performing garbage collections, G1 shows a concurrent global marking phase (i.e. phase 1 known as Marking) to determine the liveness of objects throughout the heap.<br>After the mark phase is completed, G1 knows which regions are mostly empty. It collects in these areas first, which usually yields a significant amount of free space (i.e. phase 2 known as Sweeping). It is why this method of garbage collection is called Garbage-First.</p>
+</blockquote>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>This blog mainly talks about the overview of the JVM Garbage Collection from the generation based process to garbage collector. Honestly speaking, GC is much more complex than presented in the blog, thus there is still long way to go to make a deep dive in GC, even JVM. </p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://codeahoy.com/2017/08/06/basics-of-java-garbage-collection/" target="_blank" rel="noopener">Basics of Java Garbage Collection</a></li>
+<li><a href="https://www.baeldung.com/jvm-garbage-collectors" target="_blank" rel="noopener">JVM Garbage Collectors</a></li>
+<li><a href="https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html" target="_blank" rel="noopener">Java Garbage Collection Basics</a></li>
+<li><a href="https://plumbr.io/blog/garbage-collection/minor-gc-vs-major-gc-vs-full-gc" target="_blank" rel="noopener">Minor GC vs Major GC vs Full GC</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/jvm/">#jvm</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2019/03/06/spark-sumup-part-3/">Spark Tips Sum-up Part-3</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2018/11/14/spark-second-generation-tungsten-in-spark/">Second Generation Tungsten Engine in Spark 2.x</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2019/02/26/jvm-java-garbage-collection-overview/';
+        this.page.identifier = '2019/02/26/jvm-java-garbage-collection-overview/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

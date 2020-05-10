@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Arvo, Parquet and ORC - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                
+                
+                    
+                    
+                    <a class="navbar-item" href="#Formats-Categories">1&nbsp;&nbsp;<b>Formats Categories</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Row-Formats-amp-Columnar-Formats">1.1&nbsp;&nbsp;Row Formats &amp;amp;amp; Columnar Formats</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Text-formats-amp-Binary-formats">1.2&nbsp;&nbsp;Text formats &amp;amp;amp; Binary formats</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Avro">2&nbsp;&nbsp;<b>Avro</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#Parquet">3&nbsp;&nbsp;<b>Parquet</b></a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#ORC">4&nbsp;&nbsp;<b>ORC</b></a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Indexes">4.1&nbsp;&nbsp;Indexes</a>
+                
+                    
+                    
+                    <a class="navbar-item" href="#Bloom-Filter">4.2&nbsp;&nbsp;Bloom Filter</a>
+                
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#References">5&nbsp;&nbsp;<b>References</b></a>
+                
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Arvo, Parquet and ORC
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-05-05T08:34:37.000Z" itemprop="datePublished">May 5 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/hadoop/">hadoop</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            8 minutes read (About 1209 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/background/architecture-body-of-water-buildings-2255985.jpg" alt=""><br>Dealing with HIVE is one of my daily work with which I read data from and write back to the HDFS. There are many storage formats in HIVE, such as textFile, Avro,  and so on. Today we will talk about three popular formats that are widely use in HIVE world, also in Spark and even the entire distributed file system world. Not talking about some classical formats like textFile , SequenceFile, RCFile, doesn’t mean that they are not important or good enough, so you’d better have some look at them to help you make sense of the storage formats in HIVE.<br><a id="more"></a></p>
+<h2 id="Formats-Categories"><a href="#Formats-Categories" class="headerlink" title="Formats Categories"></a>Formats Categories</h2><h3 id="Row-Formats-amp-Columnar-Formats"><a href="#Row-Formats-amp-Columnar-Formats" class="headerlink" title="Row Formats &amp; Columnar Formats"></a>Row Formats &amp; Columnar Formats</h3><p>Row formats and Columnar formats are two methods of seriallizing and storing a table in Database. And the following figure presents the difference of data stored in Row formats and in Columnar fromats.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/22/22-1.png" alt=""></p>
+<h3 id="Text-formats-amp-Binary-formats"><a href="#Text-formats-amp-Binary-formats" class="headerlink" title="Text formats &amp; Binary formats"></a>Text formats &amp; Binary formats</h3><p>Text and Binary Formats are two methods of storing data in another dimension. Text formats are human-readable, easy to generate and easy to parse, however, they occupy a lot of disk space because of the readablity and redundancy. The most popular Text formats includs CSV, TSV, JSON and so on. And, Binary formats, occupy much less storage space than Test formats while they are machine-readable rather than human-readable. However, saving in  Binary formats can make all the storage in HDFS more effcient. Also, the formats we are going to talk about, Avro, Parquet and ORC formats, are all Binary formats.</p>
+<h2 id="Avro"><a href="#Avro" class="headerlink" title="Avro"></a>Avro</h2><p>Avor is one of <strong>row-based</strong> formats, and boldly speaking, Avro is a binary alternative to JSON. Avor provides rich data strucures with the <strong>schema</strong>, and the schema file is separately stored from the data file. Also, Avro can generate the serialization and deserialization code form the schema. The figure below presents the sturcture of Avro.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/22/22-2.png" alt=""></p>
+<p>As presented, Avor firstly splits data into multiple <strong>blocks</strong> rather than stores data record by record. The schema infomation is stored in the header and the data information are in blocks followed by a <strong>sync marker</strong> for each block. The sync markers make the Avor format splittable and the schema make it extensibility.  </p>
+<h2 id="Parquet"><a href="#Parquet" class="headerlink" title="Parquet"></a>Parquet</h2><p>Parquet is a <strong>Columnar format</strong>, which is based on the Google Dremel paper, and it’s one of the most popular Columnar formats in Hadoop ecosystem and it’s well integrated with Apache Spark. What’s more, Parquet can easily deal with the nested schema. The following figure shows the structure of Parquet.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/22/22-3.png" alt=""></p>
+<p>First we need to learn some terms about Parquet:</p>
+<ul>
+<li>Blocks: The block is actually the block in HDFS, which is unchanged for Parquet;</li>
+<li>File: The HDFS file with metadata;</li>
+<li>Row group: A logical horizontal partitioning of the data into rows. A row group consists of a column chunk for each column in the dataset;</li>
+<li>Column chunk: A chunk of data for a specific column in one Row group. A column chunk consists of one or more than one page;</li>
+<li>Page: Column chunks are devided into pages. And it is conceptually indivisible unit.</li>
+</ul>
+<p>All the metadata for file, row groups, and column chunks are all stored in a footer, which is the tail of the whole file. The figure presents the structure of Parquet clearly and if you want to learn the detail, you can take a look at the <a href="https://parquet.apache.org/documentation/latest/" target="_blank" rel="noopener">offcial doc</a></p>
+<h2 id="ORC"><a href="#ORC" class="headerlink" title="ORC"></a>ORC</h2><p>ORC(Optimized Row Columnar) is also a <strong>Columnar format</strong> and it is optimized from RCFile format, which is also a Columar format. ORC is now widely used in Hadoop ecosystem especially for HIVE. Let’s start from the ORC structure.<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/22/22-4.png" alt=""></p>
+<p>First we have to make some terms clearly:</p>
+<ul>
+<li>Stripe: Simialr to the row groups in Parquet, stripe in ORC is a group of row data. Each stripe holds index data, row data and a stripe footer;</li>
+<li>Index data: Include the min and max values and row positions within each column in one stripe;</li>
+<li>Row data: The real data value;</li>
+<li>Stripe footer: Contains the directoty of stream location.</li>
+</ul>
+<p>Now let’s talk about an awesome feature in ORC, which is based on the index.</p>
+<h3 id="Indexes"><a href="#Indexes" class="headerlink" title="Indexes"></a>Indexes</h3><p>There are three level of indexes in ORC, which are file, stride and row level index. They contain some statistics like the max/min value and the position information of each vale for specific dimesion. </p>
+<blockquote>
+<ul>
+<li>file level - statistics about the values in each column across the entire file</li>
+<li>stripe level - statistics about the values in each column for each stripe</li>
+<li>row level - statistics about the values in each column for each set of 10,000 rows within a stripe(the value can be modified by <em>orc.row.index.stride</em>)</li>
+</ul>
+</blockquote>
+<p>File and stride index are in the file footer at the tail of the whole file, and as soon as the file is read, the information can be loaded directly and the useless part of data would be ignored immediately. The row level index is stored in the Index data in each stride and it contains the count of the values and whether there are null value present, and also the min/max values. Besides, the row index can include bloom filter, which will be talked in the next sub-section.<br>To make leverage of ORC index, we’d better insert the data into ORC table with sorting first, usually <em>distributed by</em> and <em>sort by</em>, to make the data are sorted well in each reducer result. Let’s have a simple example. Suppose we have a query with <em>WHERE id &gt; 10</em>, the entired file would be filter by the file level index, stride index and row level index. If the file is inserted sorted by <em>id</em>, the min/max value in each index would not be overlapping.</p>
+<h3 id="Bloom-Filter"><a href="#Bloom-Filter" class="headerlink" title="Bloom Filter"></a>Bloom Filter</h3><p>Since Hive 1.2, the bloom filter is supported in row index. If you’ve never heared about bloom filter, don’t worry about it and click <a href="https://en.wikipedia.org/wiki/Bloom_filter" target="_blank" rel="noopener">here</a> to have a quick look.<br>As the last sub-section, the indexes are in good use to filter data and make the query more efficient. But the statistics value like min/max are more efficient for those continuously numerical type columns. When you have some operation like <em>=</em> or <em>in</em>, bloom filter would be a better choice.<br>With the configuration <em>orc.bloom.filter.columns</em> and <em>orc.bloom.filter.fpp</em>, we can figure out the colunms(splitted by comma) with bloom filter and specify the positive probability for the bloom filter. </p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://parquet.apache.org/documentation/latest/" target="_blank" rel="noopener">Parquet Documentation</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC#LanguageManualORC-orc-spec" target="_blank" rel="noopener">ORC Documentation</a></li>
+<li><a href="https://www.youtube.com/watch?v=rVC9F1y38oU" target="_blank" rel="noopener">Apache Parquet: Parquet File Internals and Inspecting Parquet File Structure</a></li>
+<li><a href="https://orc.apache.org/specification/ORCv1/" target="_blank" rel="noopener">ORC Specification v1</a></li>
+<li><a href="https://orc.apache.org/docs/indexes.html" target="_blank" rel="noopener">ORC Indexes</a></li>
+<li><a href="https://snippetessay.wordpress.com/2015/07/25/hive-optimizations-with-indexes-bloom-filters-and-statistics/" target="_blank" rel="noopener">HIVE Optimizations with Indexes, BLOOM-FILTERS and Statistics</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/hdfs/">#hdfs</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/hive/">#hive</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2019/06/11/hdfs-yarn-architecture/">YARN Architecture</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2019/04/28/hdfs-architecture/">HDFS Architecture</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2019/05/05/hdfs-arvo-parquet-orc/';
+        this.page.identifier = '2019/05/05/hdfs-arvo-parquet-orc/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>

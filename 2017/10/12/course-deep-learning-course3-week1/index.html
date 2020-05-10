@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+<title>Learning Notes-Deep Learning, course3, week1 - superAsir&#39;s Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+<meta name="description" content="Hard-working developer by day and trouble maker by night.">
+
+
+
+
+
+
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.11/js/all.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    <img src="https://github.com/JoeAsir/blog-image/raw/master/blog/other/profile.jpeg" alt="" height="28">
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/">Home</a>
+            
+            <a class="navbar-item "
+               href="/archives">Archives</a>
+            
+            <a class="navbar-item "
+               href="/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/about">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/JoeAsir">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Twitter" href="https://twitter.com/joe_asir">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                
+                <i class="fab fa-instagram"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                
+                <i class="fab fa-weibo"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Best Fellow" href="https://www.unbelievable9.info/">
+                
+                <i class="fas fa-user-astronaut"></i>
+                
+            </a>
+               
+            <a class="navbar-item" title="Little Bro" href="https://yuwillrun.github.io/">
+                
+                <i class="fas fa-user-graduate"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Learning Notes-Deep Learning, course3, week1
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2017-10-12T04:34:05.000Z" itemprop="datePublished">Oct 12 2017</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/learning-notes/">learning notes</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 minutes read (About 1839 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>课程3主要讲的是deep learning中的一些strategy，这些strategy可以帮助我们快速的分析模型所存在的问题，避免我们的优化方向有偏差而导致的人力以及时间的浪费，这一点对于团队尤其重要。</p>
+<p>我们一起来recap一下week1的课程<br><a id="more"></a></p>
+<h2 id="Orthogonalization"><a href="#Orthogonalization" class="headerlink" title="Orthogonalization"></a>Orthogonalization</h2><p>对于ML task来说，有众多因素影响最终的效果，这些因素相互犬牙交错，因此我们在提升模型效果的时候，一定要把所有的因素orthogonalization一下，Ng举的例子就很形象，就像显示器的控制按钮一样，每个按钮各司其职，一个控制高度，一个控制宽度，一个控制大小，一个控制梯度，通过各自调整每一个按钮，我们可以很好的完成画面调整。</p>
+<p>对于orthogonalization优化模型，Ng给出了4方面的建议：</p>
+<ul>
+<li>Fit training set well in cost function</li>
+<li>Fit development set well on cost function</li>
+<li>Fit test set well on cost function</li>
+<li>Performs well in real world</li>
+</ul>
+<p>我们详细来看看这四条：</p>
+<p>对于第一条，首先模型必须要对于training set有良好的拟合效果，如果这点达不到的话，模型一定是<strong>high bias</strong>，也就是<strong>under fitting</strong>了，那么我们必须尝试通过more complex的模型，bigger neural networks或者是longer training time去更充分的拟合training set.</p>
+<p>对于第二条，在很好的拟合training set的前提下，我们就要看看development set的效果了，如果对于development set fit效果不好的话，那基本上就是<strong>high varience</strong>，也就是<strong>over fitting</strong>的问题了，这时候，regularization或者more training data可以解决解决这个问题。</p>
+<p>对于第三条，在符合上两条的前提下，如果模型在test set上表现不佳，我们就需要更大的development set去涵盖更多的情况，并通过扩充后的development set重复第二条的检验</p>
+<p>对于最后一条，在符合上三条的前提下，如果模型在real world中表现不佳，那么很大程度上是因为我们的development 和test set与real world相差比较多，比如猫脸检测中，我们的data set都是高清的图像，但是real world 中，都是像素很低的图像。因此，我们需要让development 和test set更接近与real world，然后重复上面的步骤。</p>
+<p>通过这四个步骤，我们就可以通过orthogonalization来完成模型的调整</p>
+<h2 id="Metric"><a href="#Metric" class="headerlink" title="Metric"></a>Metric</h2><h3 id="Single-number-evaluation"><a href="#Single-number-evaluation" class="headerlink" title="Single number evaluation"></a>Single number evaluation</h3><p>Metric无疑是ML task中很重要的环节，通过metric，我们可以评估不同模型之间的优良差异，并且可以选择出最理想的模型。</p>
+<p>但是metric指标琳郎满目，例如对于两个模型，模型A的precision高于B的，但是A的recall又低于B，这时候就不太好评价两个模型，在这种情况下，我们需要采用单一的数字评价指标，例如我们可以用F1-score来进行评估，single number evaluation metric是我们做metrics时一定要注意的</p>
+<h3 id="Satisficing-and-optimizing"><a href="#Satisficing-and-optimizing" class="headerlink" title="Satisficing   and optimizing"></a>Satisficing   and optimizing</h3><p>在某些情况下，例如我们不仅仅要求模型的指标，还对其他的，例如模型时间会有要求，如果一个模型有很高的模型accuracy，但是却很耗费时间，那是我们不能接受的，如下图例子：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/9/9-1.png" alt=""><br>图中的accuracy是optimizing metric，通常更高的accuracy就代表这classifier更加的优秀；但是，这里还有一个必须低于100ms 的running time作为satisficing metric，通常来说，如果我们有\(N\)个metrics，那么我们的optimizing metric必须只有一个，剩下的\(N-1\)metrics 都是satisficing metrics，只要以threshold形式进行限定就可以了。</p>
+<h2 id="Data-set"><a href="#Data-set" class="headerlink" title="Data set"></a>Data set</h2><h3 id="Distributions"><a href="#Distributions" class="headerlink" title="Distributions"></a>Distributions</h3><p>对于training set，dev set和test set来说，所有data一定要保证服从同一个data distribution，例如猫脸实验，如果training set是高清大图而dev set是模糊图像，那么最终一定很难获得理想的metric.</p>
+<p>最重要的是，你所构建模型的data，一定和模型应用场景的data在同样的distribution下，Ng给出的guideline是</p>
+<blockquote>
+<p>Choose a development set and test set to reflect data you expect to get in  the future and consider important to do well.</p>
+</blockquote>
+<h3 id="Size-of-data-set"><a href="#Size-of-data-set" class="headerlink" title="Size of data set"></a>Size of data set</h3><p>传统的ML task中，dataset的分布一般如下图所示：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/9/9-2.png" alt=""><br>但是在big data时代，一般采用下图：<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/9/9-3.png" alt=""><br>Ng同样给出了guideline：</p>
+<ul>
+<li>Set uop the size of test set to give a high confidence in the overall performance of the system.</li>
+<li>Test set helps evaluate the proformance of the final classifier which could be less than 30% of the whole data set</li>
+<li>The development set has to be big enough to evaluate different ideas</li>
+</ul>
+<h2 id="Change-data-set-and-metric"><a href="#Change-data-set-and-metric" class="headerlink" title="Change data set and metric"></a>Change data set and metric</h2><h3 id="Change-data-set"><a href="#Change-data-set" class="headerlink" title="Change data set"></a>Change data set</h3><p>这个问题的原因，其实就是data set不在同一distribution下的问题，如果模型在dev和test set 上都有很好的表现和metric，但是在real world中效果并不好，那么我们要做的一定就是改变data set，让dev/test set与real world在同一distribution下</p>
+<h3 id="Change-metric"><a href="#Change-metric" class="headerlink" title="Change metric"></a>Change metric</h3><p>我们使用ML来解决现实中的问题时，metric也不是一成不变的，需要根据具体的情况做出一些改变，例如，色情图像识别中，我们误讲非色情识别维色情图像，是可以接受的，但是将色情图像识别成非色情图像则是不可接受的，相似的，风控系统中，将风险用户分类为正常用户的错误，比把正常用户分类为风险用户的错误要严重很多，因此，在类似的场景下，我们的metric需要随着业务场景做出一些改变。</p>
+<p>正常情况下，我们计算的模型error是：<br>$$Error = \frac{1}{m_{dev}} \sum^{m_{dev}}<em>{i=1} \mathcal { \hat{y}^{(i)} \neq y^{(i)} }$$<br>但是在上述场景中，我们需要加入一个权重，来对两种不同错误加以区分<br>$$ w^{(i)}=\left{<br>\begin{aligned}<br>1 \quad x^{(i)}notpron \<br>10 \quad x^{(i)} pron \<br>\end{aligned}<br>\right.<br>$$<br>$$Error = \frac{1}{ \sum w^{(i)}} \sum^{m</em>{dev}}_{i=1} w^{(i)} \mathcal { \hat{y}^{(i)} \neq y^{(i)} }$$<br>这样就把两种不同的问题区分开了。</p>
+<h2 id="Improve-model-performance"><a href="#Improve-model-performance" class="headerlink" title="Improve model performance"></a>Improve model performance</h2><p>模型performance的提升是模型的核心问题，我们如何确定模型调整的大体方向，Ng给出了如下的图<br><img src="https://github.com/JoeAsir/blog-image/raw/master/blog/9/9-4.png" alt=""><br>我们默认human-level是很接近理论误差，也就是Bayes error，我们需要比较human-level，training error和dev error这三者之间的关系，human-level和training error之间的差值更大的话，我们就需要去减小bias，反之，我们需要去减少variance，具体的方法，还是我们之前的老套路。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://www.coursera.org/specializations/deep-learning" target="_blank" rel="noopener">Deep learning-Coursera Andrew Ng</a></li>
+<li><a href="https://mooc.study.163.com/course/deeplearning_ai-2001281003#/info" target="_blank" rel="noopener">Deep learning-网易云课堂 Andrew Ng</a></li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/learning-strategy/">#learning strategy</a></span>
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/orthogonalization/">#orthogonalization</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2017/10/18/course-deep-learning-course3-week2/">Learning Notes-Deep Learning, course3, week2</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/09/30/course-deep-learning-course2-week3/">Learning Notes-Deep Learning, course2, week3</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+<div class="sharebox">
+    
+<div class="addthis_inline_share_toolbox"></div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a694d4d78479a8b"></script>
+
+</div>
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://asirzhao.github.io/2017/10/12/course-deep-learning-course3-week1/';
+        this.page.identifier = '2017/10/12/course-deep-learning-course3-week1/';
+        
+        this.language = 'en';
+        
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'supaerasir' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2020 Asir Zhao&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/JoeAsir">
+                    
+                    GitHub
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Twitter" href="https://twitter.com/joe_asir">
+                    
+                    Twitter
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Instagram" href="https://www.instagram.com/zhaoyao0560/">
+                    
+                    Instagram
+                    
+                </a>
+                
+                    
+                <a class="column is-narrow has-text-black" title="Weibo" href="https://weibo.com/2144484004/profile?topnav=1&amp;wvr=6&amp;is_all=1">
+                    
+                    Weibo
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("en-AU");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+</script>
+
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+</body>
+</html>
