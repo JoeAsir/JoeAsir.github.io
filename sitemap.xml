@@ -16,14 +16,14 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2018/09/15/spark-sumup-part-1/</loc>
+    <loc>https://asirzhao.github.io/2018/01/07/spark-spark-workflow/</loc>
     
     <lastmod>2020-05-10T06:50:12.532Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2018/01/07/spark-spark-workflow/</loc>
+    <loc>https://asirzhao.github.io/2018/09/15/spark-sumup-part-1/</loc>
     
     <lastmod>2020-05-10T06:50:12.532Z</lastmod>
     
@@ -51,14 +51,14 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/09/10/paper-imbalance/</loc>
+    <loc>https://asirzhao.github.io/2017/10/22/paper-swish/</loc>
     
     <lastmod>2020-05-10T06:50:12.531Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/10/22/paper-swish/</loc>
+    <loc>https://asirzhao.github.io/2017/09/10/paper-imbalance/</loc>
     
     <lastmod>2020-05-10T06:50:12.531Z</lastmod>
     
@@ -79,13 +79,6 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2018/11/14/spark-second-generation-tungsten-in-spark/</loc>
-    
-    <lastmod>2020-05-10T06:50:12.531Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://asirzhao.github.io/2018/02/23/spark-spark-tune/</loc>
     
     <lastmod>2020-05-10T06:50:12.531Z</lastmod>
@@ -93,9 +86,9 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/08/02/ml-convex-opt/</loc>
+    <loc>https://asirzhao.github.io/2018/11/14/spark-second-generation-tungsten-in-spark/</loc>
     
-    <lastmod>2020-05-10T06:50:12.530Z</lastmod>
+    <lastmod>2020-05-10T06:50:12.531Z</lastmod>
     
   </url>
   
@@ -107,7 +100,7 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/11/11/ml-imbalanced-data-solution/</loc>
+    <loc>https://asirzhao.github.io/2017/08/02/ml-convex-opt/</loc>
     
     <lastmod>2020-05-10T06:50:12.530Z</lastmod>
     
@@ -115,6 +108,13 @@
   
   <url>
     <loc>https://asirzhao.github.io/2017/08/27/ml-ridge-lasso/</loc>
+    
+    <lastmod>2020-05-10T06:50:12.530Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://asirzhao.github.io/2017/11/11/ml-imbalanced-data-solution/</loc>
     
     <lastmod>2020-05-10T06:50:12.530Z</lastmod>
     
@@ -142,21 +142,7 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2019/04/28/hdfs-architecture/</loc>
-    
-    <lastmod>2020-05-10T06:50:12.529Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://asirzhao.github.io/2019/05/05/hdfs-arvo-parquet-orc/</loc>
-    
-    <lastmod>2020-05-10T06:50:12.529Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://asirzhao.github.io/2019/06/22/hdfs-orc-tips/</loc>
     
     <lastmod>2020-05-10T06:50:12.529Z</lastmod>
     
@@ -170,6 +156,20 @@
   </url>
   
   <url>
+    <loc>https://asirzhao.github.io/2019/06/22/hdfs-orc-tips/</loc>
+    
+    <lastmod>2020-05-10T06:50:12.529Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://asirzhao.github.io/2019/04/28/hdfs-architecture/</loc>
+    
+    <lastmod>2020-05-10T06:50:12.529Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://asirzhao.github.io/2019/02/26/jvm-java-garbage-collection-overview/</loc>
     
     <lastmod>2020-05-10T06:50:12.529Z</lastmod>
@@ -177,14 +177,14 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/09/27/course-deep-learning-course2-week2/</loc>
+    <loc>https://asirzhao.github.io/2017/09/30/course-deep-learning-course2-week3/</loc>
     
     <lastmod>2020-05-10T06:50:12.528Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/10/12/course-deep-learning-course3-week1/</loc>
+    <loc>https://asirzhao.github.io/2017/09/27/course-deep-learning-course2-week2/</loc>
     
     <lastmod>2020-05-10T06:50:12.528Z</lastmod>
     
@@ -198,7 +198,7 @@
   </url>
   
   <url>
-    <loc>https://asirzhao.github.io/2017/09/30/course-deep-learning-course2-week3/</loc>
+    <loc>https://asirzhao.github.io/2017/10/12/course-deep-learning-course3-week1/</loc>
     
     <lastmod>2020-05-10T06:50:12.528Z</lastmod>
     
